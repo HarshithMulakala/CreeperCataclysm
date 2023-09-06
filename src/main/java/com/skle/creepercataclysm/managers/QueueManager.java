@@ -17,16 +17,16 @@ public class QueueManager {
     }
 
     public void addToQueue(Player player) {
-        if (queue.size() >= plugin.MAX_PLAYERS) {
+        if (queue.size() >= plugin.getMaxPlayers()) {
             player.sendMessage(ChatColor.RED + "The queue is full!");
             return;
         }
         queue.add(player);
         for (Player p : queue) {
-            p.sendMessage(ChatColor.AQUA + player.getName() + " has joined the queue! (" + queue.size() + "/" + plugin.MAX_PLAYERS + ")");
+            p.sendMessage(ChatColor.AQUA + player.getName() + " has joined the queue! (" + queue.size() + "/" + plugin.getMaxPlayers() + ")");
         }
 
-        if(queue.size() == plugin.MAX_PLAYERS) {
+        if(queue.size() == plugin.getMaxPlayers()) {
             plugin.getGameManager().startGame();
         }
     }
@@ -37,7 +37,7 @@ public class QueueManager {
             return;
         }
         for (Player p : queue) {
-            p.sendMessage(ChatColor.AQUA + player.getName() + " has left the queue! (" + queue.size() + "/" + plugin.MAX_PLAYERS + ")");
+            p.sendMessage(ChatColor.AQUA + player.getName() + " has left the queue! (" + queue.size() + "/" + plugin.getMaxPlayers() + ")");
         }
         queue.remove(player);
     }

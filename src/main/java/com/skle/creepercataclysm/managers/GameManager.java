@@ -170,7 +170,7 @@ public class GameManager {
 
     private void notifyTimeLeft() {
         if(timeLeft == 60){
-            for(Player p : attackers) {
+            for(Player p : players) {
                 p.sendTitle(ChatColor.RED + "1 Minute Remaining!", "", 10, 40, 10);
             }
         }
@@ -186,7 +186,7 @@ public class GameManager {
             for(PotionEffect effect : p.getActivePotionEffects()) {
                 p.removePotionEffect(effect.getType());
             }
-            p.setGameMode(GameMode.CREATIVE);
+            p.setGameMode(GameMode.SURVIVAL);
         }
         players.clear();
         defenders.clear();
@@ -216,5 +216,9 @@ public class GameManager {
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public void setTimeLeft(int timeLeft) {
+        this.timeLeft = timeLeft;
     }
 }

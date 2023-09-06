@@ -15,3 +15,19 @@ commands:
     description: Leave the queue for a game
     usage: /<command>
     aliases: [l, quit, q]
+  setplayers:
+    description: Set the number of players in a game
+    usage: /<command> <number>
+    aliases: [sp]
+  settime:
+    description: Set the time for a game
+    usage: /<command> <number>
+    aliases: [st]
+  abort:
+    description: Abort the game
+    usage: /<command>
+    aliases: [a]
+  forcestart:
+    description: Force start the game
+    usage: /<command>
+    aliases: [fs, start]
