@@ -1,0 +1,17 @@
+name: CreeperCataclysm
+version: '1.0-SNAPSHOT'
+main: com.skle.creepercataclysm.CreeperCataclysm
+api-version: 1.20
+commands:
+  play:
+    description: Queue up for a game
+    usage: /<command>
+    aliases: [join, p, j]
+  queue:
+    description: List the players in queue
+    usage: /<command>
+    aliases: [q]
+  leave:
+    description: Leave the queue for a game
+    usage: /<command>
+    aliases: [l, quit, q]

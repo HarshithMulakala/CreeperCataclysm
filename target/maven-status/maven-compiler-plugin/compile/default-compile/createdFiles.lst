@@ -1,0 +1,11 @@
+com\skle\creepercataclysm\managers\QueueManager.class
+com\skle\creepercataclysm\managers\GameManager.class
+com\skle\creepercataclysm\commands\PlayCommand.class
+com\skle\creepercataclysm\commands\LeaveCommand.class
+com\skle\creepercataclysm\listeners\EntityDeathListener.class
+com\skle\creepercataclysm\listeners\EntityDamageListener.class
+com\skle\creepercataclysm\managers\GameManager$2.class
+com\skle\creepercataclysm\commands\QueueCommand.class
+com\skle\creepercataclysm\api\CreeperCataclysmPlugin.class
+com\skle\creepercataclysm\managers\GameManager$1.class
+com\skle\creepercataclysm\CreeperCataclysm.class
