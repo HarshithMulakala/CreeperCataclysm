@@ -15,7 +15,7 @@ import com.skle.creepercataclysm.managers.QueueManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
-//TODO: Add a shop system, swapteam debug (tentative), permissions, and a config file
+//TODO: Add a shop system, swapteam debug (tentative), permissions, give arrows & steak back on death, and a config file
 
 public final class CreeperCataclysm extends JavaPlugin implements CreeperCataclysmPlugin {
 

@@ -146,7 +146,7 @@ public class GameManager {
             public void run() {
                 checkPowerups();
                 notifyTimeLeft();
-                if(timeLeft == 0) {
+                if(timeLeft == 0 || !isGameStarted()) {
                     endGame(0);
                     cancel();
                     return;
