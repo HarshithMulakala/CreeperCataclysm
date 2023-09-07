@@ -31,3 +31,7 @@ commands:
     description: Force start the game
     usage: /<command>
     aliases: [fs, start]
+  addgold:
+    description: Add gold to a player
+    usage: /<command> <player> <amount>
+    aliases: [ag]

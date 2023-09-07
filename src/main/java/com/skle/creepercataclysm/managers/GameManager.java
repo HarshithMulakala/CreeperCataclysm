@@ -2,6 +2,8 @@ package com.skle.creepercataclysm.managers;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
@@ -47,6 +49,16 @@ public class GameManager {
         initBossBar();
         initTimer();
         initCreeper();
+        initGold();
+        initShop();
+    }
+
+    private void initGold() {
+        plugin.getGoldManager().initGame();
+    }
+
+    private void initShop() {
+        plugin.getShopManager().initShop();
     }
 
     private void initCreeper() {
@@ -95,7 +107,10 @@ public class GameManager {
         player.getInventory().setItem(2, new ItemStack(Material.FISHING_ROD));
         player.getInventory().setItem(3, new ItemStack(Material.COOKED_BEEF, 8));
         player.getInventory().setItem(4, new ItemStack(Material.ARROW, 5));
-        player.getInventory().setItem(8, new ItemStack(Material.GOLD_INGOT, 0));
+
+        ItemStack goldIngot = new ItemStack(Material.GOLD_INGOT, 1); // TODO: This doesn't work, from looks of it not possible anymore
+        goldIngot.setAmount(0);
+        player.getInventory().addItem(goldIngot);
 
         ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
@@ -118,7 +133,7 @@ public class GameManager {
     }
 
     private void initBossBar() {
-        bossBar = Bukkit.createBossBar(ChatColor.RED + "Creeper Health", org.bukkit.boss.BarColor.RED, org.bukkit.boss.BarStyle.SOLID);
+        bossBar = Bukkit.createBossBar(ChatColor.RED + "Creeper Health", BarColor.RED, BarStyle.SOLID);
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -196,6 +211,8 @@ public class GameManager {
         bossBar.removeAll();
         plugin.getQueueManager().notifyGameEnd(winner);
         plugin.getQueueManager().resetQueue();
+        plugin.getGoldManager().resetGame();
+        plugin.getShopManager().resetShop();
     }
 
     public boolean isGameStarted() {

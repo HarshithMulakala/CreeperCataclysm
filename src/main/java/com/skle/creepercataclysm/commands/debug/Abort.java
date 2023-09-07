@@ -1,6 +1,7 @@
 package com.skle.creepercataclysm.commands.debug;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,6 +20,7 @@ public class Abort implements CommandExecutor {
             return false;
         }
         plugin.getGameManager().endGame(0);
+        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME ABORTED");
         return true;
     }
 }
