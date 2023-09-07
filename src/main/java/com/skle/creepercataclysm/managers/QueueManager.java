@@ -17,6 +17,10 @@ public class QueueManager {
     }
 
     public void addToQueue(Player player) {
+        if(plugin.getGameManager().isGameStarted()) {
+            player.sendMessage(ChatColor.RED + "The game has already started!");
+            return;
+        }
         if (queue.size() >= plugin.getMaxPlayers()) {
             player.sendMessage(ChatColor.RED + "The queue is full!");
             return;

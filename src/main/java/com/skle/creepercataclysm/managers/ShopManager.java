@@ -9,55 +9,119 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Map;
 
 public class ShopManager {
     private final CreeperCataclysmPlugin plugin;
     private final Inventory defenderShop;
     private final Inventory attackerShop;
-    private final Location defenderShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 83.5, -90, 0);
-    private final Location attackerShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 57.5, -90, 0);
+//    private final Location defenderShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 83.5, -90, 0);
+//    private final Location attackerShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 57.5, -90, 0);
     private Villager defenderVillager;
     private Villager attackerVillager;
 
     private final ShopItem[] defenderShopItems = {
-            new ShopItem(new ItemStack(Material.STONE_SWORD),
-                    5, 0,
+            new ShopItem(Material.STONE_SWORD,
+                    5, 0, "Stone Sword", "A sword made of stone.",
                     new Material[]{ // Items to override
                             Material.WOODEN_SWORD
-            }),
-            new ShopItem(new ItemStack(Material.IRON_SWORD),
-                    10, 1,
+                    }),
+            new ShopItem(Material.IRON_SWORD,
+                    10, 1, "Iron Sword", "A sword made of iron.",
                     new Material[]{ // Items to override
-                        Material.WOODEN_SWORD,
-                        Material.STONE_SWORD
-            })
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD
+                    }),
+            new ShopItem(Material.DIAMOND_SWORD,
+                    15, 2, "Diamond Sword", "A sword made of diamond.",
+                    new Material[]{ // Items to override
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD,
+                            Material.IRON_SWORD
+                    }),
+            new ShopItem(Material.NETHERITE_SWORD,
+                    20, 3, "Netherite Sword", "A sword made of netherite.",
+                    new Material[]{ // Items to overrideMateri
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD,
+                            Material.IRON_SWORD,
+                            Material.DIAMOND_SWORD
+                    })
     };
 
     private final ShopItem[] attackerShopItems = {
-            new ShopItem(new ItemStack(Material.DIAMOND_SWORD), 5, 0),
-            new ShopItem(new ItemStack(Material.IRON_SWORD), 10, 1)};
+            new ShopItem(Material.STONE_SWORD,
+                    5, 0, "Stone Sword", "A sword made of stone.",
+                    new Material[]{ // Items to override
+                            Material.WOODEN_SWORD
+                    }),
+            new ShopItem(Material.IRON_SWORD,
+                    10, 1, "Iron Sword", "A sword made of iron.",
+                    new Material[]{ // Items to override
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD
+                    }),
+            new ShopItem(Material.DIAMOND_SWORD,
+                    15, 2, "Diamond Sword", "A sword made of diamond.",
+                    new Material[]{ // Items to override
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD,
+                            Material.IRON_SWORD
+                    }),
+            new ShopItem(Material.NETHERITE_SWORD,
+                    20, 3, "Netherite Sword", "A sword made of netherite.",
+                    new Material[]{ // Items to override
+                            Material.WOODEN_SWORD,
+                            Material.STONE_SWORD,
+                            Material.IRON_SWORD,
+                            Material.DIAMOND_SWORD
+                    })
+    };
 
     private static class ShopItem {
-        public ItemStack item;
+        public Material item;
         public int cost;
         public int slot;
+        public String name;
+        public String description;
         public Material[] itemToReplace;
 
-        public ShopItem(ItemStack item, int cost, int slot) {
-            this.item = item;
-            this.cost = cost;
-            this.slot = slot;
-            itemToReplace = null;
+        public ItemStack displayStack;
+        public ItemStack purchaseStack;
+
+        public ShopItem(Material item, int cost, int slot, String name, String description) {
+            this(item, cost, slot, name, description, null);
         }
 
-        public ShopItem(ItemStack item, int cost, int slot, Material[] itemToReplace) {
+        public ShopItem(Material item, int cost, int slot, String name, String description, Material[] itemToReplace) {
             this.item = item;
             this.cost = cost;
             this.slot = slot;
+            this.name = name;
+            this.description = description;
             this.itemToReplace = itemToReplace;
+
+            displayStack = new ItemStack(item);
+            ItemMeta displayMeta = displayStack.getItemMeta();
+            displayMeta.setDisplayName("§r" + name);
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Cost: " + ChatColor.GOLD + cost + " Gold");
+            lore.add("\n");
+            lore.add(ChatColor.GRAY + description);
+            displayMeta.setLore(lore);
+            displayMeta.setUnbreakable(true);
+            displayStack.setItemMeta(displayMeta);
+
+            purchaseStack = new ItemStack(item);
+            ItemMeta purchaseMeta = purchaseStack.getItemMeta();
+            purchaseMeta.setDisplayName("§r" + name);
+            purchaseMeta.setUnbreakable(true);
+            purchaseStack.setItemMeta(purchaseMeta);
         }
     }
 
@@ -66,21 +130,21 @@ public class ShopManager {
 
         defenderShop = plugin.getServer().createInventory(null, 9, ChatColor.BLUE + "Defender Shop");
         for(ShopItem item : defenderShopItems) {
-            defenderShop.setItem(item.slot, item.item);
+            defenderShop.setItem(item.slot, item.displayStack);
         }
 
         attackerShop = plugin.getServer().createInventory(null, 9, ChatColor.RED + "Attacker Shop");
         for(ShopItem item : attackerShopItems) {
-            attackerShop.setItem(item.slot, item.item);
+            attackerShop.setItem(item.slot, item.displayStack);
         }
     }
 
     public void initShop() {
-        defenderVillager = defenderShopLocation.getWorld().spawn(defenderShopLocation, Villager.class);
+        defenderVillager = plugin.getGameManager().getCurrentMap().defendervillagerspawn.getWorld().spawn(plugin.getGameManager().getCurrentMap().defendervillagerspawn, Villager.class);
         defenderVillager.setAI(false);
         defenderVillager.setInvulnerable(true);
 
-        attackerVillager = attackerShopLocation.getWorld().spawn(attackerShopLocation, Villager.class);
+        attackerVillager = plugin.getGameManager().getCurrentMap().attackervillagerspawn.getWorld().spawn(plugin.getGameManager().getCurrentMap().attackervillagerspawn, Villager.class);
         attackerVillager.setAI(false);
         attackerVillager.setInvulnerable(true);
     }
@@ -98,15 +162,17 @@ public class ShopManager {
         if (plugin.getGoldManager().getGoldInInventory(player) >= item.cost) {
             plugin.getGoldManager().removeGold(player, item.cost);
             if(item.itemToReplace != null) {
+                Bukkit.getLogger().info("Replacing items");
                 for(Material material : item.itemToReplace) {
+                    Bukkit.getLogger().info("Replacing " + material.name());
                     player.getInventory().remove(material);
                 }
             }
-            player.getInventory().addItem(item.item);
-            player.sendMessage(ChatColor.GREEN + "You bought " + item.item.getType().toString() + " for " + item.cost + " gold!");
+            player.getInventory().addItem(item.purchaseStack);
+            player.sendMessage(ChatColor.GREEN + "You bought " + item.name + " for " + item.cost + " gold!");
         }
         else {
-            player.sendMessage(ChatColor.RED + "You don't have enough gold to buy " + item.item.getType().toString() + "! You need " + (item.cost - plugin.getGoldManager().getGoldInInventory(player)) + " more gold!");
+            player.sendMessage(ChatColor.RED + "You don't have enough gold to buy " + item.name + "! You need " + (item.cost - plugin.getGoldManager().getGoldInInventory(player)) + " more gold!");
         }
     }
 

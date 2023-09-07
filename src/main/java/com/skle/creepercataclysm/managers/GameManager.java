@@ -5,6 +5,8 @@ import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,17 +16,19 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class GameManager {
     private final CreeperCataclysmPlugin plugin;
 
-    private final Location defenderSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 83.5, 180, 0);
-    private final Location attackerSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 57.5, 0, 0);
-    private final Location creeperSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 70.5, -90, 0);
-    private final Location lobbySpawn = new Location(Bukkit.getWorlds().get(0), 55.5, -52, 30.5, 0, 0);
+//    private final Location defenderSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 83.5, 180, 0);
+//    private final Location attackerSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 57.5, 0, 0);
+//    private final Location creeperSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 70.5, -90, 0);
+    private Location lobbySpawn;
 
     private boolean gameStarted = false;
 
@@ -36,13 +40,63 @@ public class GameManager {
     private BossBar bossBar;
 
     private int timeLeft;
+    private List<GameMap> maps;
+    private GameMap currentMap;
 
     public GameManager(CreeperCataclysmPlugin plugin){
         this.plugin = plugin;
+        initConfig();
+    }
+
+    public class GameMap {
+        public final String name;
+        public final Location attackerspawn;
+        public final Location attackervillagerspawn;
+        public final Location defenderspawn;
+        public final Location defendervillagerspawn;
+        public final Location creeperspawn;
+
+        public GameMap(String name, Location attackerspawn, Location attackervillager, Location defenderspawn, Location defendervillager, Location creeper) {
+            this.name = name;
+            this.attackerspawn = attackerspawn;
+            this.attackervillagerspawn = attackervillager;
+            this.defenderspawn = defenderspawn;
+            this.defendervillagerspawn = defendervillager;
+            this.creeperspawn = creeper;
+        }
+    }
+
+    public void initConfig() {
+        maps = new ArrayList<>();
+        FileConfiguration config = plugin.getPluginConfig();
+        ConfigurationSection lobby = config.getConfigurationSection("lobby");
+        ConfigurationSection maps = config.getConfigurationSection("maps");
+        if(maps == null || lobby == null) {
+            Bukkit.getLogger().severe("No maps found in config!");
+            Bukkit.getLogger().severe("No maps found in config!");
+            Bukkit.getLogger().severe("No maps found in config!");
+            return;
+        }
+        lobbySpawn = new Location(Bukkit.getWorld(lobby.getString("world")), lobby.getDouble("x"), lobby.getDouble("y"), lobby.getDouble("z"), (float)lobby.getDouble("yaw"), (float)lobby.getDouble("pitch"));
+        Bukkit.getLogger().info("Lobby spawn set to " + lobbySpawn.toString());
+        for(String mapKey : maps.getKeys(false)) { // HOLY SHIT THIS IS AWFUL PLEASE PLEASE PLEASE FIGURE OUT A BETTER WAY
+            ConfigurationSection mapData = maps.getConfigurationSection(mapKey);
+            String mapName = mapKey;
+            Location attackerspawn = new Location(Bukkit.getWorld(mapData.getString("attackerspawn.world")), mapData.getDouble("attackerspawn.x"), mapData.getDouble("attackerspawn.y"), mapData.getDouble("attackerspawn.z"), (float)mapData.getDouble("attackerspawn.yaw"), (float)mapData.getDouble("attackerspawn.pitch"));
+            Location attackervillager = new Location(Bukkit.getWorld(mapData.getString("attackervillager.world")), mapData.getDouble("attackervillager.x"), mapData.getDouble("attackervillager.y"), mapData.getDouble("attackervillager.z"), (float)mapData.getDouble("attackervillager.yaw"), (float)mapData.getDouble("attackervillager.pitch"));
+            Location defenderspawn = new Location(Bukkit.getWorld(mapData.getString("defenderspawn.world")), mapData.getDouble("defenderspawn.x"), mapData.getDouble("defenderspawn.y"), mapData.getDouble("defenderspawn.z"), (float)mapData.getDouble("defenderspawn.yaw"), (float)mapData.getDouble("defenderspawn.pitch"));
+            Location defendervillager = new Location(Bukkit.getWorld(mapData.getString("defendervillager.world")), mapData.getDouble("defendervillager.x"), mapData.getDouble("defendervillager.y"), mapData.getDouble("defendervillager.z"), (float)mapData.getDouble("defendervillager.yaw"), (float)mapData.getDouble("defendervillager.pitch"));
+            Location creeper = new Location(Bukkit.getWorld(mapData.getString("creeper.world")), mapData.getDouble("creeper.x"), mapData.getDouble("creeper.y"), mapData.getDouble("creeper.z"), (float)mapData.getDouble("creeper.yaw"), (float)mapData.getDouble("creeper.pitch"));
+            GameMap gameMap = new GameMap(mapName, attackerspawn, attackervillager, defenderspawn, defendervillager, creeper);
+            this.maps.add(gameMap);
+        }
+
     }
 
     public void startGame() {
-        Bukkit.getLogger().info("Game has begun");
+        Bukkit.getLogger().info("Amount of maps: " + maps.size());
+        currentMap = maps.get(new Random().nextInt(maps.size()));
+        Bukkit.getLogger().info("Game has begun with map " + currentMap.name + "!");
         timeLeft = 130;
         this.gameStarted = true;
         initPlayers();
@@ -62,7 +116,7 @@ public class GameManager {
     }
 
     private void initCreeper() {
-        creeper = creeperSpawn.getWorld().spawn(creeperSpawn, Creeper.class);
+        creeper = currentMap.creeperspawn.getWorld().spawn(currentMap.creeperspawn, Creeper.class);
         creeper.setPowered(true);
         creeper.setAI(false);
         creeper.setMaxHealth(1000);
@@ -77,14 +131,14 @@ public class GameManager {
         for (int i = 0; i < players.size(); i++) {
             if (i % 2 == 0) {
                 defenders.add(players.get(i));
-                players.get(i).setBedSpawnLocation(defenderSpawn, true);
-                players.get(i).teleport(defenderSpawn);
+                players.get(i).setBedSpawnLocation(currentMap.defenderspawn, true);
+                players.get(i).teleport(currentMap.defenderspawn);
                 players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", "", 10, 40, 10);
                 setDefaultInventory(players.get(i), 0);
             } else {
                 attackers.add(players.get(i));
-                players.get(i).setBedSpawnLocation(attackerSpawn, true);
-                players.get(i).teleport(attackerSpawn);
+                players.get(i).setBedSpawnLocation(currentMap.attackerspawn, true);
+                players.get(i).teleport(currentMap.attackerspawn);
                 players.get(i).sendTitle(ChatColor.RED + "You are an attacker!", "", 10, 40, 10);
                 setDefaultInventory(players.get(i), 1);
             }
@@ -145,7 +199,8 @@ public class GameManager {
                     return;
                 }
                 bossBar.setProgress(creeper.getHealth() / creeper.getMaxHealth());
-                bossBar.setTitle(ChatColor.RED + "Creeper Health: " + Math.round(creeper.getHealth()*10)/10 + "/" + creeper.getMaxHealth());
+                DecimalFormat df = new DecimalFormat("#.0");
+                bossBar.setTitle(ChatColor.RED + "Creeper Health: " + df.format(creeper.getHealth()) + "/" + df.format(creeper.getHealth()));
                 bossBar.setVisible(true);
                 for (Player p : players) {
                     bossBar.addPlayer(p);
@@ -202,6 +257,7 @@ public class GameManager {
                 p.removePotionEffect(effect.getType());
             }
             p.setGameMode(GameMode.SURVIVAL);
+            p.sendMessage(lobbySpawn.toString());
         }
         players.clear();
         defenders.clear();
@@ -237,5 +293,9 @@ public class GameManager {
 
     public void setTimeLeft(int timeLeft) {
         this.timeLeft = timeLeft;
+    }
+
+    public GameMap getCurrentMap() {
+        return currentMap;
     }
 }

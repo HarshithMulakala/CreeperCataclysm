@@ -6,9 +6,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 public class EntityInteractListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -28,5 +30,21 @@ public class EntityInteractListener implements Listener {
             event.getPlayer().openInventory(plugin.getShopManager().getAttackerShop());
         }
         else return;
+    }
+
+    @EventHandler
+    public void PlayerInteractEvent(PlayerInteractEvent event) {
+        //See if the player is zoning
+        if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if(event.getItem() == null) return;
+            Player player = event.getPlayer();
+            if(event.getItem().equals(plugin.getZoneManager().getLobbyZoneWand())) {
+                player.sendMessage("You have clicked a lobby zone wand");
+                plugin.getZoneManager().setLobbyZone(player);
+            }
+            else if (event.getItem().equals(plugin.getZoneManager().getMapZoneWand())) {
+                player.sendMessage("You have clicked a map zone wand");
+            }
+         }
     }
 }

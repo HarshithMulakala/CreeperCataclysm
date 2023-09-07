@@ -35,3 +35,11 @@ commands:
     description: Add gold to a player
     usage: /<command> <player> <amount>
     aliases: [ag]
+  zonelobby:
+    description: Set the lobby zone
+    usage: /<command>
+    aliases: []
+  zonemap:
+    description: Set the map zone
+    usage: /<command> <map>
+    aliases: []

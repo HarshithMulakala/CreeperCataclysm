@@ -1,9 +1,7 @@
 package com.skle.creepercataclysm.api;
 
-import com.skle.creepercataclysm.managers.GameManager;
-import com.skle.creepercataclysm.managers.GoldManager;
-import com.skle.creepercataclysm.managers.QueueManager;
-import com.skle.creepercataclysm.managers.ShopManager;
+import com.skle.creepercataclysm.managers.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
 public interface CreeperCataclysmPlugin extends Plugin {
@@ -11,6 +9,10 @@ public interface CreeperCataclysmPlugin extends Plugin {
     QueueManager getQueueManager();
     GoldManager getGoldManager();
     ShopManager getShopManager();
+    ZoneManager getZoneManager();
+
+    FileConfiguration getPluginConfig();
+    void reloadPluginConfig();
 
     int getMaxPlayers();
     void setMaxPlayers(int maxPlayers);
