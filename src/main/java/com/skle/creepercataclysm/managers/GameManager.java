@@ -95,6 +95,11 @@ public class GameManager {
 
     public void startGame() {
         Bukkit.getLogger().info("Amount of maps: " + maps.size());
+        if(maps.size() <= 0) {
+            plugin.getQueueManager().getQueue().forEach(player -> player.sendMessage(ChatColor.RED + "No maps found in config!"));
+            Bukkit.getLogger().severe("No maps found in config!");
+            return;
+        }
         currentMap = maps.get(new Random().nextInt(maps.size()));
         Bukkit.getLogger().info("Game has begun with map " + currentMap.name + "!");
         timeLeft = 130;
@@ -257,7 +262,6 @@ public class GameManager {
                 p.removePotionEffect(effect.getType());
             }
             p.setGameMode(GameMode.SURVIVAL);
-            p.sendMessage(lobbySpawn.toString());
         }
         players.clear();
         defenders.clear();

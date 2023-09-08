@@ -13,6 +13,7 @@ public interface CreeperCataclysmPlugin extends Plugin {
 
     FileConfiguration getPluginConfig();
     void reloadPluginConfig();
+    void reloadConfigFromDisk();
 
     int getMaxPlayers();
     void setMaxPlayers(int maxPlayers);

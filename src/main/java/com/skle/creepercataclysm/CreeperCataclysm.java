@@ -37,6 +37,8 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("addgold").setExecutor(new AddGold(  this));
         getCommand("zonelobby").setExecutor(new ZoneLobbyCommand(  this));
         getCommand("zonemap").setExecutor(new ZoneMapCommand(  this));
+        getCommand("reloadconfig").setExecutor(new ReloadConfig(  this));
+        getCommand("cancelzone").setExecutor(new CancelZoneCommand(  this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);
@@ -44,6 +46,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         Bukkit.getServer().getPluginManager().registerEvents(new ItemListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EntityInteractListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
     }
 
     @Override
@@ -94,5 +97,12 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         config = getConfig();
         this.getGameManager().initConfig();
         Bukkit.getLogger().info("Configs reloaded.");
+    }
+
+    public void reloadConfigFromDisk() {
+        reloadConfig();
+        config = getConfig();
+        this.getGameManager().initConfig();
+        Bukkit.getLogger().info("Configs reloaded from disk.");
     }
 }

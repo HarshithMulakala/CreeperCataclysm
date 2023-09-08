@@ -1,4 +1,4 @@
-package com.skle.creepercataclysm.commands;
+package com.skle.creepercataclysm.commands.debug;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.ChatColor;
@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ZoneMapCommand implements CommandExecutor {
+public class ReloadConfig implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public ZoneMapCommand(CreeperCataclysmPlugin plugin) {
+    public ReloadConfig(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class ZoneMapCommand implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        player.sendMessage(ChatColor.AQUA + "You have been given a map zoning stick! Click anywhere to get started.");
-        player.getInventory().addItem(plugin.getZoneManager().getMapZoneWand());
+        plugin.reloadConfigFromDisk();
+        sender.sendMessage(ChatColor.RED + "[DEBUG] CONFIG RELOADED FROM DISK");
         return true;
     }
 }

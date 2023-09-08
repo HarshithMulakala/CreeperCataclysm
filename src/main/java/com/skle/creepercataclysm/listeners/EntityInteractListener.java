@@ -39,11 +39,10 @@ public class EntityInteractListener implements Listener {
             if(event.getItem() == null) return;
             Player player = event.getPlayer();
             if(event.getItem().equals(plugin.getZoneManager().getLobbyZoneWand())) {
-                player.sendMessage("You have clicked a lobby zone wand");
                 plugin.getZoneManager().setLobbyZone(player);
             }
             else if (event.getItem().equals(plugin.getZoneManager().getMapZoneWand())) {
-                player.sendMessage("You have clicked a map zone wand");
+                plugin.getZoneManager().setMapZone(player);
             }
          }
     }

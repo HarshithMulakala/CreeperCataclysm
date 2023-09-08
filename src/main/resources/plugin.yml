@@ -43,3 +43,11 @@ commands:
     description: Set the map zone
     usage: /<command> <map>
     aliases: []
+  reloadconfig:
+    description: Reload the config
+    usage: /<command>
+    aliases: []
+  cancelzone:
+    description: Cancel the zone selection
+    usage: /<command>
+    aliases: []

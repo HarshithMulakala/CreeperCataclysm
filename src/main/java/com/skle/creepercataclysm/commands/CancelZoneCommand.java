@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ZoneMapCommand implements CommandExecutor {
+public class CancelZoneCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public ZoneMapCommand(CreeperCataclysmPlugin plugin) {
+    public CancelZoneCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,12 @@ public class ZoneMapCommand implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        player.sendMessage(ChatColor.AQUA + "You have been given a map zoning stick! Click anywhere to get started.");
-        player.getInventory().addItem(plugin.getZoneManager().getMapZoneWand());
+        if(plugin.getZoneManager().isZoningMap(player)) {
+            plugin.getZoneManager().cancelMapZone(player);
+            player.sendMessage(ChatColor.AQUA + "Map zoning cancelled.");
+        } else {
+            player.sendMessage(ChatColor.RED + "You are not zoning a map.");
+        }
         return true;
     }
 }

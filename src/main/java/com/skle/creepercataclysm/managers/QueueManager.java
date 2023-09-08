@@ -25,6 +25,10 @@ public class QueueManager {
             player.sendMessage(ChatColor.RED + "The queue is full!");
             return;
         }
+        if (queue.contains(player)) {
+            player.sendMessage(ChatColor.RED + "You are already in the queue!");
+            return;
+        }
         queue.add(player);
         for (Player p : queue) {
             p.sendMessage(ChatColor.AQUA + player.getName() + " has joined the queue! (" + queue.size() + "/" + plugin.getMaxPlayers() + ")");
