@@ -1,0 +1,94 @@
+name: Maven Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get latest release info
+        run: |
+          LATEST_RELEASE=$(curl --silent "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}")
+          LATEST_SHA=$(echo $LATEST_RELEASE | jq -r '.target_commitish')
+          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate release notes
+        run: |
+          NOTES=$(git log --pretty=format:'- %s' $LATEST_SHA..HEAD | sed 's/$/\\n/g')
+          echo "NOTES=${NOTES}" >> $GITHUB_ENV
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Extract version from pom.xml
+        run: echo "VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_ENV
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" \
+                          -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+                          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.VERSION }}")
+          if [[ "$HTTP_CODE" -eq 200 ]]; then
+            echo "Release already exists, skipping..."
+            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Release does not exist, creating..."
+            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+
+      - name: Create GitHub Release
+        id: create_release
+        if: env.RELEASE_EXISTS == 'false'
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: ${{ env.VERSION }}
+          #          body: Release of version ${{ env.VERSION }}
+          body: |
+            Release of version ${{ env.VERSION }}
+            
+            ### Changelog
+            ${{ env.NOTES }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload_release_asset
+        if: env.RELEASE_EXISTS == 'false'
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/CreeperCataclysm-${{ env.VERSION }}.jar
+          asset_name: CreeperCataclysm.jar
+          asset_content_type: application/java-archive
