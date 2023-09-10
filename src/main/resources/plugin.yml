@@ -18,7 +18,7 @@ commands:
   setplayers:
     description: Set the number of players in a game
     usage: /<command> <number>
-    aliases: [sp]
+    aliases: []
   settime:
     description: Set the time for a game
     usage: /<command> <number>

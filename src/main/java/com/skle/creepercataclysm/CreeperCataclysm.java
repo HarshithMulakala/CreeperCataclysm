@@ -9,7 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-//TODO: config file, add shop items, custom enchants
+//TODO: add shop items, custom enchants
 
 public final class CreeperCataclysm extends JavaPlugin implements CreeperCataclysmPlugin {
 
@@ -30,14 +30,14 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("play").setExecutor(new PlayCommand(this));
         getCommand("queue").setExecutor(new QueueCommand(this));
         getCommand("leave").setExecutor(new LeaveCommand(this));
-        getCommand("setplayers").setExecutor(new SetPlayers(this));
-        getCommand("settime").setExecutor(new SetTime(this));
-        getCommand("abort").setExecutor(new Abort(this));
-        getCommand("forcestart").setExecutor(new ForceStart(  this));
-        getCommand("addgold").setExecutor(new AddGold(  this));
+        getCommand("setplayers").setExecutor(new SetPlayersCommand(this));
+        getCommand("settime").setExecutor(new SetTimeCommand(this));
+        getCommand("abort").setExecutor(new AbortCommand(this));
+        getCommand("forcestart").setExecutor(new ForceStartCommand(  this));
+        getCommand("addgold").setExecutor(new AddGoldCommand(  this));
         getCommand("zonelobby").setExecutor(new ZoneLobbyCommand(  this));
         getCommand("zonemap").setExecutor(new ZoneMapCommand(  this));
-        getCommand("reloadconfig").setExecutor(new ReloadConfig(  this));
+        getCommand("reloadconfig").setExecutor(new ReloadConfigCommand(  this));
         getCommand("cancelzone").setExecutor(new CancelZoneCommand(  this));
 
         // Register listeners
@@ -47,6 +47,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         Bukkit.getServer().getPluginManager().registerEvents(new EntityInteractListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
     }
 
     @Override

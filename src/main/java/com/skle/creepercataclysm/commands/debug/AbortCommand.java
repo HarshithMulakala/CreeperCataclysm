@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SetPlayers implements CommandExecutor {
+public class AbortCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public SetPlayers(CreeperCataclysmPlugin plugin) {
+    public AbortCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,12 @@ public class SetPlayers implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        plugin.setMaxPlayers(Integer.parseInt(args[0]));
-        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME PLAYERS SET TO " + args[0]);
+        if(!plugin.getGameManager().isGameStarted()) {
+            sender.sendMessage(ChatColor.RED + "[DEBUG] GAME NOT STARTED");
+            return true;
+        }
+        plugin.getGameManager().endGame(0);
+        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME ABORTED");
         return true;
     }
 }

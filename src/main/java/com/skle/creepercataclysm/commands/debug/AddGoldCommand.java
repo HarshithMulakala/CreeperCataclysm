@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ReloadConfig implements CommandExecutor {
+public class AddGoldCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public ReloadConfig(CreeperCataclysmPlugin plugin) {
+    public AddGoldCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class ReloadConfig implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        plugin.reloadConfigFromDisk();
-        sender.sendMessage(ChatColor.RED + "[DEBUG] CONFIG RELOADED FROM DISK");
+        plugin.getGoldManager().addGold(player, Integer.parseInt(args[0]));
+        sender.sendMessage(ChatColor.RED + "[DEBUG] ADDED + " + args[0] + " GOLD");
         return true;
     }
 }

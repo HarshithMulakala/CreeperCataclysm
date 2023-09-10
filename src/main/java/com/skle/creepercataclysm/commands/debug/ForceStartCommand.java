@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SetTime implements CommandExecutor {
+public class ForceStartCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public SetTime(CreeperCataclysmPlugin plugin) {
+    public ForceStartCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class SetTime implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        plugin.getGameManager().setTimeLeft(Integer.parseInt(args[0]));
-        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME TIME SET TO " + args[0] + " SECONDS");
+        plugin.getGameManager().startGame();
+        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME FORCE STARTED");
         return true;
     }
 }

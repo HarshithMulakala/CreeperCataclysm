@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class AddGold implements CommandExecutor {
+public class SetPlayersCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public AddGold(CreeperCataclysmPlugin plugin) {
+    public SetPlayersCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class AddGold implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        plugin.getGoldManager().addGold(player, Integer.parseInt(args[0]));
-        sender.sendMessage(ChatColor.RED + "[DEBUG] ADDED + " + args[0] + " GOLD");
+        plugin.setMaxPlayers(Integer.parseInt(args[0]));
+        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME PLAYERS SET TO " + args[0]);
         return true;
     }
 }

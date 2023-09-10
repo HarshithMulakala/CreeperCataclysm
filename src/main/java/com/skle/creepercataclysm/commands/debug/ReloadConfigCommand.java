@@ -7,10 +7,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Abort implements CommandExecutor {
+public class ReloadConfigCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public Abort(CreeperCataclysmPlugin plugin) {
+    public ReloadConfigCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -19,8 +19,8 @@ public class Abort implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        plugin.getGameManager().endGame(0);
-        sender.sendMessage(ChatColor.RED + "[DEBUG] GAME ABORTED");
+        plugin.reloadConfigFromDisk();
+        sender.sendMessage(ChatColor.RED + "[DEBUG] CONFIG RELOADED FROM DISK");
         return true;
     }
 }

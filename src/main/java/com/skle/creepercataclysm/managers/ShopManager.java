@@ -51,7 +51,10 @@ public class ShopManager {
                             Material.STONE_SWORD,
                             Material.IRON_SWORD,
                             Material.DIAMOND_SWORD
-                    })
+                    }),
+            new ShopItem(Material.FIRE_CHARGE,
+                    5, 4, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    new Material[]{})
     };
 
     private final ShopItem[] attackerShopItems = {
@@ -80,7 +83,10 @@ public class ShopManager {
                             Material.STONE_SWORD,
                             Material.IRON_SWORD,
                             Material.DIAMOND_SWORD
-                    })
+                    }),
+            new ShopItem(Material.FIRE_CHARGE,
+                    5, 4, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    new Material[]{})
     };
 
     private static class ShopItem {

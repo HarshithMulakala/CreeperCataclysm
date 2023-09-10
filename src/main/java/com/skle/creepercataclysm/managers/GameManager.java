@@ -90,7 +90,6 @@ public class GameManager {
             GameMap gameMap = new GameMap(mapName, attackerspawn, attackervillager, defenderspawn, defendervillager, creeper);
             this.maps.add(gameMap);
         }
-
     }
 
     public void startGame() {
@@ -256,6 +255,7 @@ public class GameManager {
         for(Player p : players) {
             p.setLevel(0);
             p.setExp(0);
+            p.getInventory().clear();
             p.teleport(lobbySpawn);
             p.setBedSpawnLocation(lobbySpawn, true);
             for(PotionEffect effect : p.getActivePotionEffects()) {
