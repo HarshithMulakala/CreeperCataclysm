@@ -125,6 +125,7 @@ public class GameManager {
         creeper.setAI(false);
         creeper.setMaxHealth(1000);
         creeper.setHealth(1000);
+        creeper.setCustomName(ChatColor.GREEN + "CORE");
     }
 
     private void initPlayers() {
@@ -261,7 +262,7 @@ public class GameManager {
             for(PotionEffect effect : p.getActivePotionEffects()) {
                 p.removePotionEffect(effect.getType());
             }
-            p.setGameMode(GameMode.SURVIVAL);
+            p.setGameMode(GameMode.ADVENTURE);
         }
         players.clear();
         defenders.clear();
