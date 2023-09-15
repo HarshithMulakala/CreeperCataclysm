@@ -2,12 +2,16 @@ package com.skle.creepercataclysm.listeners;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class EntityDamageListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -38,6 +42,10 @@ public class EntityDamageListener implements Listener {
             else if(event.getDamager() instanceof Arrow arrow) {
                 if(!(arrow.getShooter() instanceof Player player)) return;
                 attacker = player;
+                if((!(plugin.getGameManager().getAttackers().contains(attacker) && plugin.getGameManager().getAttackers().contains(attacked))) && (!(plugin.getGameManager().getDefenders().contains(attacker) && plugin.getGameManager().getDefenders().contains(attacked))) ){
+                    attacker.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                }
+
             }
             else if(event.getDamager() instanceof Fireball) {
                 Bukkit.getLogger().info("Fireball damage");
@@ -55,5 +63,16 @@ public class EntityDamageListener implements Listener {
 
         }
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onHit(ProjectileHitEvent e)
+    {
+        Projectile p = e.getEntity();
+        if(p instanceof Arrow)
+        {
+            p.remove();
+        }
+        return;
     }
 }

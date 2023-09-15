@@ -40,6 +40,8 @@ public class GameManager {
     private BossBar bossBar;
 
     private int timeLeft;
+
+    private int totalTime;
     private List<GameMap> maps;
     private GameMap currentMap;
 
@@ -101,7 +103,6 @@ public class GameManager {
         }
         currentMap = maps.get(new Random().nextInt(maps.size()));
         Bukkit.getLogger().info("Game has begun with map " + currentMap.name + "!");
-        timeLeft = 130;
         this.gameStarted = true;
         initPlayers();
         initBossBar();
@@ -109,6 +110,8 @@ public class GameManager {
         initCreeper();
         initGold();
         initShop();
+        timeLeft = (60 * 5) + ((attackers.size() - 1) * 60);
+        totalTime = (60 * 5) + ((attackers.size() - 1) * 60);
     }
 
     private void initGold() {
@@ -123,9 +126,11 @@ public class GameManager {
         creeper = currentMap.creeperspawn.getWorld().spawn(currentMap.creeperspawn, Creeper.class);
         creeper.setPowered(true);
         creeper.setAI(false);
-        creeper.setMaxHealth(1000);
-        creeper.setHealth(1000);
+        int creeperhealth = 500 + (200 * attackers.size());
+        creeper.setMaxHealth(creeperhealth);
+        creeper.setHealth(creeperhealth);
         creeper.setCustomName(ChatColor.GREEN + "CORE");
+        creeper.setRemoveWhenFarAway(false);
     }
 
     private void initPlayers() {
@@ -183,7 +188,7 @@ public class GameManager {
         player.getInventory().setChestplate(chestplate);
 
         for(ItemStack item : player.getInventory().getContents()) {
-            if(item != null && item.getData() != null) {
+            if(item != null && item.getData() != null && item.getType() != Material.ARROW && item.getType() != Material.COOKED_BEEF) {
                 ItemMeta meta = item.getItemMeta();
                 meta.setUnbreakable(true);
                 item.setItemMeta(meta);
@@ -205,7 +210,7 @@ public class GameManager {
                 }
                 bossBar.setProgress(creeper.getHealth() / creeper.getMaxHealth());
                 DecimalFormat df = new DecimalFormat("#.0");
-                bossBar.setTitle(ChatColor.RED + "Creeper Health: " + df.format(creeper.getHealth()) + "/" + df.format(creeper.getHealth()));
+                bossBar.setTitle(ChatColor.RED + "Creeper Health: " + df.format(creeper.getHealth()) + "/" + df.format(creeper.getMaxHealth()));
                 bossBar.setVisible(true);
                 for (Player p : players) {
                     bossBar.addPlayer(p);
@@ -236,7 +241,7 @@ public class GameManager {
     }
 
     private void checkPowerups() {
-        if(timeLeft == 120){
+        if(timeLeft <= (totalTime / 2)){
             for(Player p : attackers) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
             }
