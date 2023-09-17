@@ -53,31 +53,32 @@ public class ShopManager {
                             Material.DIAMOND_SWORD
                     }),
             new ShopItem(Material.FIRE_CHARGE,
-                    5, 4, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    3, 4, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    new Material[]{}),
+            new ShopItem(Material.GOLDEN_APPLE,
+                    1, 5, "Golden Apple", "An apple that gives you regeneration",
+                    new Material[]{}),
+            new ShopItem(Material.SHIELD,
+                    15, 6, "Shield", "A shield that can be used to block attacks.",
                     new Material[]{})
     };
 
     private final ShopItem[] attackerShopItems = {
-            new ShopItem(Material.STONE_SWORD,
-                    5, 0, "Stone Sword", "A sword made of stone.",
-                    new Material[]{ // Items to override
-                            Material.WOODEN_SWORD
-                    }),
             new ShopItem(Material.IRON_SWORD,
-                    10, 1, "Iron Sword", "A sword made of iron.",
+                    5, 0, "Iron Sword", "A sword made of iron.",
                     new Material[]{ // Items to override
                             Material.WOODEN_SWORD,
                             Material.STONE_SWORD
                     }),
             new ShopItem(Material.DIAMOND_SWORD,
-                    15, 2, "Diamond Sword", "A sword made of diamond.",
+                    10, 1, "Diamond Sword", "A sword made of diamond.",
                     new Material[]{ // Items to override
                             Material.WOODEN_SWORD,
                             Material.STONE_SWORD,
                             Material.IRON_SWORD
                     }),
             new ShopItem(Material.NETHERITE_SWORD,
-                    20, 3, "Netherite Sword", "A sword made of netherite.",
+                    15, 2, "Netherite Sword", "A sword made of netherite.",
                     new Material[]{ // Items to override
                             Material.WOODEN_SWORD,
                             Material.STONE_SWORD,
@@ -85,7 +86,13 @@ public class ShopManager {
                             Material.DIAMOND_SWORD
                     }),
             new ShopItem(Material.FIRE_CHARGE,
-                    5, 4, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    3, 3, "Fireball", "A fireball that can be thrown at enemies, yourself, or barriers.",
+                    new Material[]{}),
+            new ShopItem(Material.GOLDEN_APPLE,
+                    1, 4, "Golden Apple", "An apple that gives you regeneration",
+                    new Material[]{}),
+            new ShopItem(Material.SHIELD,
+                    15, 5, "Shield", "A shield that can be used to block attacks.",
                     new Material[]{})
     };
 

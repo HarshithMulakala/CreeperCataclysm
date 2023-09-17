@@ -2,11 +2,16 @@ package com.skle.creepercataclysm.listeners;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -30,6 +35,14 @@ public class EntityExplodeListener implements Listener {
                 double launchStrength = 1.4;
                 player.setVelocity(direction.normalize().multiply(launchStrength));
             }
+        }
+    }
+
+    @EventHandler
+    public void BlockChangedEvent(EntityChangeBlockEvent event) {
+        if(!(plugin.getGameManager().isGameStarted())) return;
+        if(event.getBlock().getType() == Material.POWDER_SNOW && event.getTo() == Material.AIR) {
+            event.setCancelled(true);
         }
     }
 }

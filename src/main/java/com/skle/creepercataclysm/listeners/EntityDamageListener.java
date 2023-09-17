@@ -3,6 +3,7 @@ package com.skle.creepercataclysm.listeners;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,9 +26,16 @@ public class EntityDamageListener implements Listener {
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if(!plugin.getGameManager().isGameStarted()) return;
 
+        if(event.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            event.setCancelled(true);
+            return;
+        }
         if(event.getEntity().equals(plugin.getGameManager().getCreeper())) {
             if(event.getDamager() instanceof Player player) {
-                if(plugin.getGameManager().getAttackers().contains(player)) return;
+                if(plugin.getGameManager().getAttackers().contains(player)) {
+                    plugin.getGameManager().notifyCreeperHit();
+                    return;
+                }
             }
             else if(event.getDamager() instanceof Arrow arrow) {
                 if(!(arrow.getShooter() instanceof Player player)) return;
@@ -66,12 +75,20 @@ public class EntityDamageListener implements Listener {
     }
 
     @EventHandler
-    public void onHit(ProjectileHitEvent e)
+    public void onHit(ProjectileHitEvent event)
     {
-        Projectile p = e.getEntity();
-        if(p instanceof Arrow)
-        {
+        Bukkit.getLogger().info("Projectile hit");
+        Projectile p = event.getEntity();
+        if(p instanceof Arrow) {
             p.remove();
+        }
+        if(p instanceof Fireball fireball) {
+            Bukkit.getLogger().info("Fireball hit");
+            Block blockhit = event.getHitBlock();
+            if(blockhit != null && blockhit.getType() == Material.POWDER_SNOW) {
+                event.setCancelled(true);
+                Bukkit.getLogger().info("Fireball hit powder snow");
+            }
         }
         return;
     }

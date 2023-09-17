@@ -25,9 +25,6 @@ import java.util.Random;
 public class GameManager {
     private final CreeperCataclysmPlugin plugin;
 
-//    private final Location defenderSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 83.5, 180, 0);
-//    private final Location attackerSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 57.5, 0, 0);
-//    private final Location creeperSpawn = new Location(Bukkit.getWorlds().get(0), 24.5, -59, 70.5, -90, 0);
     private Location lobbySpawn;
 
     private boolean gameStarted = false;
@@ -40,14 +37,39 @@ public class GameManager {
     private BossBar bossBar;
 
     private int timeLeft;
-
     private int totalTime;
+
+    private int lastCreeperHitTime;
+
     private List<GameMap> maps;
     private GameMap currentMap;
 
     public GameManager(CreeperCataclysmPlugin plugin){
         this.plugin = plugin;
         initConfig();
+    }
+
+    public void notifyCreeperHit() {
+        int lastHit = lastCreeperHitTime;
+        lastCreeperHitTime = timeLeft;
+        if(lastHit - lastCreeperHitTime > 5) {
+            for (Player player : getDefenders()) {
+                player.sendMessage(ChatColor.RED + "§lThe creeper is under attack!");
+                soundAlarm(player);
+            }
+        }
+    }
+    public void soundAlarm(Player player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(lastCreeperHitTime - timeLeft > 2 || !isGameStarted()) {
+                    cancel();
+                    return;
+                }
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1, 9);
+            }
+        }.runTaskTimer(plugin,0, 10);
     }
 
     public class GameMap {
@@ -112,6 +134,7 @@ public class GameManager {
         initShop();
         timeLeft = (60 * 5) + ((attackers.size() - 1) * 60);
         totalTime = (60 * 5) + ((attackers.size() - 1) * 60);
+        lastCreeperHitTime = timeLeft;
     }
 
     private void initGold() {
@@ -126,7 +149,7 @@ public class GameManager {
         creeper = currentMap.creeperspawn.getWorld().spawn(currentMap.creeperspawn, Creeper.class);
         creeper.setPowered(true);
         creeper.setAI(false);
-        int creeperhealth = 500 + (200 * attackers.size());
+        int creeperhealth = 500 + (100 * attackers.size());
         creeper.setMaxHealth(creeperhealth);
         creeper.setHealth(creeperhealth);
         creeper.setCustomName(ChatColor.GREEN + "CORE");
@@ -143,13 +166,28 @@ public class GameManager {
                 defenders.add(players.get(i));
                 players.get(i).setBedSpawnLocation(currentMap.defenderspawn, true);
                 players.get(i).teleport(currentMap.defenderspawn);
-                players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", "", 10, 40, 10);
+                players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", ChatColor.BLUE + "Map: " + currentMap.name, 10, 40, 10);
+                players.get(i).sendMessage(
+                        ChatColor.YELLOW + "§l============================================\n" +
+                        ChatColor.GOLD + "You are a" + ChatColor.BLUE + " §lDefender!\n" +
+                        ChatColor.GOLD + "Defend your creeper from the attackers until time ends!\n" +
+                        ChatColor.GOLD + "You can buy items from the shop using gold!\n" +
+                        ChatColor.GOLD + "Obtain gold by slaying " + ChatColor.RED + "Attackers!\n" +
+                        ChatColor.YELLOW + "§l============================================");
                 setDefaultInventory(players.get(i), 0);
             } else {
                 attackers.add(players.get(i));
                 players.get(i).setBedSpawnLocation(currentMap.attackerspawn, true);
                 players.get(i).teleport(currentMap.attackerspawn);
-                players.get(i).sendTitle(ChatColor.RED + "You are an attacker!", "", 10, 40, 10);
+                players.get(i).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
+                players.get(i).sendTitle(ChatColor.RED + "You are an attacker!", ChatColor.RED + "Map: " + currentMap.name, 10, 40, 10);
+                players.get(i).sendMessage(
+                        ChatColor.YELLOW + "§l============================================\n" +
+                                ChatColor.GOLD + "You are an" + ChatColor.RED + " §lAttacker!\n" +
+                                ChatColor.GOLD + "Kill the " + ChatColor.BLUE + "Defenders' " + ChatColor.GOLD + "creeper before time runs out!\n" +
+                                ChatColor.GOLD + "You can buy items from the shop using gold!\n" +
+                                ChatColor.GOLD + "Obtain gold by slaying " + ChatColor.BLUE + "Defenders!\n" +
+                                ChatColor.YELLOW + "§l============================================");
                 setDefaultInventory(players.get(i), 1);
             }
             for (PotionEffect effect : players.get(i).getActivePotionEffects()) {
@@ -166,16 +204,15 @@ public class GameManager {
         player.getInventory().clear();
         player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
         player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
-        player.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
+        player.getInventory().setItem(0, new ItemStack(team == 0 ? Material.WOODEN_SWORD : Material.STONE_SWORD));
         player.getInventory().setItem(1, new ItemStack(Material.BOW));
         player.getInventory().setItem(2, new ItemStack(Material.FISHING_ROD));
         player.getInventory().setItem(3, new ItemStack(Material.COOKED_BEEF, 8));
-        player.getInventory().setItem(4, new ItemStack(Material.ARROW, 5));
+        player.getInventory().setItem(4, new ItemStack(Material.ARROW, (team == 0 ? 3 : 5)));
 
         ItemStack goldIngot = new ItemStack(Material.GOLD_INGOT, 1); // TODO: This doesn't work, from looks of it not possible anymore
         goldIngot.setAmount(0);
         player.getInventory().addItem(goldIngot);
-
         ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
         LeatherArmorMeta helmetItemMeta = (LeatherArmorMeta) helmet.getItemMeta();
