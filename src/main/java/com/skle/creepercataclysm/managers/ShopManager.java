@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
@@ -18,13 +19,13 @@ import java.util.Map;
 
 public class ShopManager {
     private final CreeperCataclysmPlugin plugin;
+
     private final Inventory defenderShop;
     private final Inventory attackerShop;
 //    private final Location defenderShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 83.5, -90, 0);
 //    private final Location attackerShopLocation = new Location(Bukkit.getWorlds().get(0), 21.5, -59, 57.5, -90, 0);
     private Villager defenderVillager;
     private Villager attackerVillager;
-
     private final ShopItem[] defenderShopItems = {
             new ShopItem(Material.STONE_SWORD,
                     5, 0, "Stone Sword", "A sword made of stone.",
@@ -60,6 +61,9 @@ public class ShopManager {
                     new Material[]{}),
             new ShopItem(Material.SHIELD,
                     15, 6, "Shield", "A shield that can be used to block attacks.",
+                    new Material[]{}),
+            new ShopItem(Material.GOAT_HORN,
+                    15, 7, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
                     new Material[]{})
     };
 
@@ -93,6 +97,9 @@ public class ShopManager {
                     new Material[]{}),
             new ShopItem(Material.SHIELD,
                     15, 5, "Shield", "A shield that can be used to block attacks.",
+                    new Material[]{}),
+            new ShopItem(Material.GOAT_HORN,
+                    15, 6, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
                     new Material[]{})
     };
 
@@ -134,6 +141,9 @@ public class ShopManager {
             ItemMeta purchaseMeta = purchaseStack.getItemMeta();
             purchaseMeta.setDisplayName("§r" + name);
             purchaseMeta.setUnbreakable(true);
+            if(item == Material.GOAT_HORN){
+                purchaseMeta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
+            }
             purchaseStack.setItemMeta(purchaseMeta);
         }
     }

@@ -35,7 +35,6 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("abort").setExecutor(new AbortCommand(this));
         getCommand("forcestart").setExecutor(new ForceStartCommand(  this));
         getCommand("addgold").setExecutor(new AddGoldCommand(  this));
-        getCommand("zonelobby").setExecutor(new ZoneLobbyCommand(  this));
         getCommand("zonemap").setExecutor(new ZoneMapCommand(  this));
         getCommand("reloadconfig").setExecutor(new ReloadConfigCommand(  this));
         getCommand("cancelzone").setExecutor(new CancelZoneCommand(  this));

@@ -15,6 +15,10 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.NameTagVisibility;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -32,6 +36,12 @@ public class GameManager {
     private List<Player> players = new ArrayList<>();
     private List<Player> defenders = new ArrayList<>();
     private List<Player> attackers = new ArrayList<>();
+    private ScoreboardManager manager = Bukkit.getScoreboardManager();
+
+    private Scoreboard board = manager.getMainScoreboard();
+    private Team scoreAttackers = board.getTeam("Attackers");
+    private Team scoreDefenders = board.getTeam("Defenders");;
+
 
     private Creeper creeper;
     private BossBar bossBar;
@@ -117,6 +127,10 @@ public class GameManager {
     }
 
     public void startGame() {
+        scoreDefenders.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
+        scoreDefenders.setColor(ChatColor.BLUE);
+        scoreAttackers.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
+        scoreAttackers.setColor(ChatColor.RED);
         Bukkit.getLogger().info("Amount of maps: " + maps.size());
         if(maps.size() <= 0) {
             plugin.getQueueManager().getQueue().forEach(player -> player.sendMessage(ChatColor.RED + "No maps found in config!"));
@@ -164,6 +178,7 @@ public class GameManager {
         for (int i = 0; i < players.size(); i++) {
             if (i % 2 == 0) {
                 defenders.add(players.get(i));
+                scoreDefenders.addEntry(players.get(i).getName());
                 players.get(i).setBedSpawnLocation(currentMap.defenderspawn, true);
                 players.get(i).teleport(currentMap.defenderspawn);
                 players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", ChatColor.BLUE + "Map: " + currentMap.name, 10, 40, 10);
@@ -177,9 +192,9 @@ public class GameManager {
                 setDefaultInventory(players.get(i), 0);
             } else {
                 attackers.add(players.get(i));
+                scoreAttackers.addEntry(players.get(i).getName());
                 players.get(i).setBedSpawnLocation(currentMap.attackerspawn, true);
                 players.get(i).teleport(currentMap.attackerspawn);
-                players.get(i).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
                 players.get(i).sendTitle(ChatColor.RED + "You are an attacker!", ChatColor.RED + "Map: " + currentMap.name, 10, 40, 10);
                 players.get(i).sendMessage(
                         ChatColor.YELLOW + "§l============================================\n" +
@@ -278,6 +293,11 @@ public class GameManager {
     }
 
     private void checkPowerups() {
+        if(timeLeft <= totalTime && timeLeft > (totalTime / 2)){
+            for(Player p : attackers) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
+            }
+        }
         if(timeLeft <= (totalTime / 2)){
             for(Player p : attackers) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
@@ -305,6 +325,12 @@ public class GameManager {
                 p.removePotionEffect(effect.getType());
             }
             p.setGameMode(GameMode.ADVENTURE);
+        }
+        for (String playerName : scoreAttackers.getEntries()) {
+            scoreAttackers.removeEntry(playerName);
+        }
+        for (String playerName : scoreDefenders.getEntries()) {
+            scoreDefenders.removeEntry(playerName);
         }
         players.clear();
         defenders.clear();
@@ -340,6 +366,10 @@ public class GameManager {
 
     public void setTimeLeft(int timeLeft) {
         this.timeLeft = timeLeft;
+    }
+
+    public int getTimeLeft() {
+        return timeLeft;
     }
 
     public GameMap getCurrentMap() {

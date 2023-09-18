@@ -26,7 +26,6 @@ public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void EntityExplode(EntityExplodeEvent event){
-        if(!(plugin.getGameManager().isGameStarted())) return;
         if(!(event.getEntity() instanceof Fireball fireball)) return;
         event.blockList().clear();
         for (Entity entity : fireball.getNearbyEntities(fireball.getYield(), fireball.getYield(), fireball.getYield())) {
