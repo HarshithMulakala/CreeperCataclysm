@@ -1,7 +1,16 @@
 package com.skle.creepercataclysm.managers;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
+import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
 import org.bukkit.*;
+import java.util.Objects;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -19,12 +28,16 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
+import java.util.Collection;
+import java.util.Collections;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class GameManager {
     private final CreeperCataclysmPlugin plugin;
@@ -36,11 +49,13 @@ public class GameManager {
     private List<Player> players = new ArrayList<>();
     private List<Player> defenders = new ArrayList<>();
     private List<Player> attackers = new ArrayList<>();
-    private ScoreboardManager manager = Bukkit.getScoreboardManager();
+    private ScoreboardManager manager;
 
-    private Scoreboard board = manager.getMainScoreboard();
-    private Team scoreAttackers = board.getTeam("Attackers");
-    private Team scoreDefenders = board.getTeam("Defenders");;
+    private Scoreboard board;
+    private Team scoreAttackers;
+    private Team scoreDefenders;
+
+    private Team seeGlow;
 
 
     private Creeper creeper;
@@ -56,6 +71,8 @@ public class GameManager {
 
     public GameManager(CreeperCataclysmPlugin plugin){
         this.plugin = plugin;
+        manager = Bukkit.getScoreboardManager();
+        board = manager.getMainScoreboard();
         initConfig();
     }
 
@@ -127,6 +144,18 @@ public class GameManager {
     }
 
     public void startGame() {
+        if(board.getTeam("attackers") != null) {
+            scoreAttackers = board.getTeam("attackers");
+        }
+        else {
+            scoreAttackers = board.registerNewTeam("attackers");
+        }
+        if(board.getTeam("defenders") != null) {
+            scoreDefenders = board.getTeam("defenders");
+        }
+        else {
+            scoreDefenders = board.registerNewTeam("defenders");
+        }
         scoreDefenders.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
         scoreDefenders.setColor(ChatColor.BLUE);
         scoreAttackers.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.FOR_OTHER_TEAMS);
@@ -212,6 +241,7 @@ public class GameManager {
             players.get(i).setFoodLevel(20);
             players.get(i).setHealth(20);
             players.get(i).setSaturation(0);
+
         }
     }
 
@@ -311,6 +341,49 @@ public class GameManager {
                 p.sendTitle(ChatColor.RED + "1 Minute Remaining!", "", 10, 40, 10);
             }
         }
+    }
+
+    public void showGlow() {
+        var protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                if(isGameStarted()){
+                    for (Player player : getPlayers()) {
+                        Team theGlow = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(player.getName());
+                        if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
+                            if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
+                                WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
+                                if (watcher.getWatchableObjects().stream()
+                                        .map(WrappedWatchableObject::getValue)
+                                        .filter(Byte.class::isInstance)
+                                        .map(Byte.class::cast)
+                                        .filter(Objects::nonNull)
+                                        .anyMatch(b -> b == ((byte) 0x40))){
+                                    return;
+                                }
+                                if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
+                                    WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
+                                    // Collect if the entity is already glowing.
+                                    byte data = watcher.getByte(0);
+                                    data |= 1 << 6;
+                                    wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
+                                    wrapper.setEntityID(event.getPlayer().getEntityId());
+                                    wrapper.sendPacket(player);
+                                }
+                                else {
+                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
+                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
+                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
+                                    newwrapper.sendPacket(player);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
     }
 
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers

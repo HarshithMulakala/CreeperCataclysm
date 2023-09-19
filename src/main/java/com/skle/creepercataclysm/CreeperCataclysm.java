@@ -8,6 +8,11 @@ import com.skle.creepercataclysm.managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+
+
 
 //TODO: add shop items, custom enchants
 
@@ -20,6 +25,8 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
     private final GoldManager goldManager = new GoldManager(this);
     private final ShopManager shopManager = new ShopManager(this);
     private final ZoneManager zoneManager = new ZoneManager(this);
+
+    private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
     private int MAX_PLAYERS = 2;
     @Override
@@ -48,6 +55,8 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
+
+        gameManager.showGlow();
     }
 
     @Override
@@ -66,6 +75,10 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
     @Override
     public QueueManager getQueueManager() {
         return queueManager;
+    }
+
+    public ProtocolManager getProtocolManager() {
+        return manager;
     }
 
     @Override
