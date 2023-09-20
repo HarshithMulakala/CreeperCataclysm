@@ -44,6 +44,7 @@ public class EntityDeathListener implements Listener {
         if(plugin.getGameManager().getKillMap().get(attacker) < 3){
             plugin.getGameManager().getKillMap().put(attacker, plugin.getGameManager().getKillMap().get(attacker) + 1);
         }
+        attacker.setHealth(attacker.getHealth() + (attacker.getHealth() > 16 ? (20 - attacker.getHealth()) : 4));
         plugin.getGoldManager().addGold(attacker, plugin.getGameManager().getKillMap().get(attacker));
 
         //Set the victim's steak to 8 and arrows to 5
