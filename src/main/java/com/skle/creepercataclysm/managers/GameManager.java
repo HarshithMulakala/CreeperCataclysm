@@ -10,7 +10,9 @@ import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
 import org.bukkit.*;
-import java.util.Objects;
+
+import java.util.*;
+
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -28,15 +30,10 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
-import java.util.Collection;
-import java.util.Collections;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class GameManager {
@@ -49,6 +46,8 @@ public class GameManager {
     private List<Player> players = new ArrayList<>();
     private List<Player> defenders = new ArrayList<>();
     private List<Player> attackers = new ArrayList<>();
+
+    private HashMap<Player, Integer> killMap = new HashMap<>();
     private ScoreboardManager manager;
 
     private Scoreboard board;
@@ -144,6 +143,7 @@ public class GameManager {
     }
 
     public void startGame() {
+        killMap = new HashMap<>();
         if(board.getTeam("attackers") != null) {
             scoreAttackers = board.getTeam("attackers");
         }
@@ -206,20 +206,6 @@ public class GameManager {
         Collections.shuffle(players);
         for (int i = 0; i < players.size(); i++) {
             if (i % 2 == 0) {
-                defenders.add(players.get(i));
-                scoreDefenders.addEntry(players.get(i).getName());
-                players.get(i).setBedSpawnLocation(currentMap.defenderspawn, true);
-                players.get(i).teleport(currentMap.defenderspawn);
-                players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", ChatColor.BLUE + "Map: " + currentMap.name, 10, 40, 10);
-                players.get(i).sendMessage(
-                        ChatColor.YELLOW + "§l============================================\n" +
-                        ChatColor.GOLD + "You are a" + ChatColor.BLUE + " §lDefender!\n" +
-                        ChatColor.GOLD + "Defend your creeper from the attackers until time ends!\n" +
-                        ChatColor.GOLD + "You can buy items from the shop using gold!\n" +
-                        ChatColor.GOLD + "Obtain gold by slaying " + ChatColor.RED + "Attackers!\n" +
-                        ChatColor.YELLOW + "§l============================================");
-                setDefaultInventory(players.get(i), 0);
-            } else {
                 attackers.add(players.get(i));
                 scoreAttackers.addEntry(players.get(i).getName());
                 players.get(i).setBedSpawnLocation(currentMap.attackerspawn, true);
@@ -233,6 +219,20 @@ public class GameManager {
                                 ChatColor.GOLD + "Obtain gold by slaying " + ChatColor.BLUE + "Defenders!\n" +
                                 ChatColor.YELLOW + "§l============================================");
                 setDefaultInventory(players.get(i), 1);
+            } else {
+                defenders.add(players.get(i));
+                scoreDefenders.addEntry(players.get(i).getName());
+                players.get(i).setBedSpawnLocation(currentMap.defenderspawn, true);
+                players.get(i).teleport(currentMap.defenderspawn);
+                players.get(i).sendTitle(ChatColor.BLUE + "You are a defender!", ChatColor.BLUE + "Map: " + currentMap.name, 10, 40, 10);
+                players.get(i).sendMessage(
+                        ChatColor.YELLOW + "§l============================================\n" +
+                                ChatColor.GOLD + "You are a" + ChatColor.BLUE + " §lDefender!\n" +
+                                ChatColor.GOLD + "Defend your creeper from the attackers until time ends!\n" +
+                                ChatColor.GOLD + "You can buy items from the shop using gold!\n" +
+                                ChatColor.GOLD + "Obtain gold by slaying " + ChatColor.RED + "Attackers!\n" +
+                                ChatColor.YELLOW + "§l============================================");
+                setDefaultInventory(players.get(i), 0);
             }
             for (PotionEffect effect : players.get(i).getActivePotionEffects()) {
                 players.get(i).removePotionEffect(effect.getType());
@@ -241,7 +241,7 @@ public class GameManager {
             players.get(i).setFoodLevel(20);
             players.get(i).setHealth(20);
             players.get(i).setSaturation(0);
-
+            killMap.put(players.get(i), 0);
         }
     }
 
@@ -419,6 +419,10 @@ public class GameManager {
 
     public boolean isGameStarted() {
         return gameStarted;
+    }
+
+    public HashMap<Player, Integer> getKillMap() {
+        return killMap;
     }
 
     public Creeper getCreeper() {
