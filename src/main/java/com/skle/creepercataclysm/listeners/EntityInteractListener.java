@@ -3,6 +3,7 @@ package com.skle.creepercataclysm.listeners;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -65,6 +66,7 @@ public class EntityInteractListener implements Listener {
             else if(plugin.getGameManager().isGameStarted() && plugin.getGameManager().getPlayers().contains(player) && event.getItem().getType().equals(Material.GOAT_HORN)){
                 event.getItem().setAmount(event.getItem().getAmount() - 1);
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0));
+                player.stopAllSounds();
                 for (Entity entity : player.getNearbyEntities(10, 10, 10)) {
                     if(entity instanceof Player nearbyPlayer) {
                         if(plugin.getGameManager().getDefenders().contains(player)) {
@@ -77,8 +79,21 @@ public class EntityInteractListener implements Listener {
                                 nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0));
                             }
                         }
+                        nearbyPlayer.stopAllSounds();
                     }
                 }
+                player.stopAllSounds();
+                if(plugin.getGameManager().getAttackers().contains(player)){
+                    for(Player p : plugin.getGameManager().getPlayers()){
+                        p.playSound(p.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_5, 5, 1);
+                    }
+                }
+                else{
+                    for(Player p : plugin.getGameManager().getPlayers()){
+                        p.playSound(p.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 5, 1);
+                    }
+                }
+
             }
          }
     }
