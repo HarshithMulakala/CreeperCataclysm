@@ -46,21 +46,6 @@ public class EntityDeathListener implements Listener {
         }
         attacker.setHealth(attacker.getHealth() + (attacker.getHealth() > 16 ? (20 - attacker.getHealth()) : 4));
         plugin.getGoldManager().addGold(attacker, plugin.getGameManager().getKillMap().get(attacker));
-
-        //Set the victim's steak to 8 and arrows to 5
-        ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
-        ItemStack arrows = new ItemStack(Material.ARROW, 5);
-        for(ItemStack item : victim.getInventory().getContents()){
-            if(item == null) continue;
-            if(item.getType() == Material.COOKED_BEEF) {
-                steak.setAmount(steak.getAmount() - item.getAmount());
-            }
-            else if(item.getType() == Material.ARROW) {
-                arrows.setAmount(arrows.getAmount() - item.getAmount());
-            }
-        }
-        victim.getInventory().addItem(steak);
-        victim.getInventory().addItem(arrows);
         plugin.getGameManager().getKillMap().put(victim, 0);
     }
 }
