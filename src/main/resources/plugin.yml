@@ -52,3 +52,7 @@ commands:
     description: Cancel the zone selection
     usage: /<command>
     aliases: []
+  setSpecial:
+    description: Set the block to healing item
+    usage: /<command>
+    aliases: []

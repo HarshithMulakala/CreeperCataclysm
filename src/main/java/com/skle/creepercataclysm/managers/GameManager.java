@@ -13,6 +13,7 @@ import org.bukkit.*;
 
 import java.util.*;
 
+import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -26,7 +27,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
@@ -34,7 +34,6 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 public class GameManager {
     private final CreeperCataclysmPlugin plugin;
@@ -42,6 +41,8 @@ public class GameManager {
     private Location lobbySpawn;
 
     private boolean gameStarted = false;
+
+    private boolean gameEnded = false;
 
     private List<Player> players = new ArrayList<>();
     private List<Player> defenders = new ArrayList<>();
@@ -55,6 +56,8 @@ public class GameManager {
     private Team scoreDefenders;
 
     private Team seeGlow;
+
+    private static final HashMap<Block, Boolean> specialBlocks = new HashMap<>();
 
 
     private Creeper creeper;
@@ -143,6 +146,7 @@ public class GameManager {
     }
 
     public void startGame() {
+        gameEnded = false;
         killMap = new HashMap<>();
         if(board.getTeam("attackers") != null) {
             scoreAttackers = board.getTeam("attackers");
@@ -170,9 +174,6 @@ public class GameManager {
         Bukkit.getLogger().info("Game has begun with map " + currentMap.name + "!");
         this.gameStarted = true;
         initPlayers();
-        initBossBar();
-        initTimer();
-        initCreeper();
         initGold();
         initShop();
         timeLeft = (60 * 5) + ((attackers.size() - 1) * 60);
@@ -194,6 +195,8 @@ public class GameManager {
         creeper.setAI(false);
         int creeperhealth = 500 + (100 * attackers.size());
         creeper.setMaxHealth(creeperhealth);
+        creeper.setMaxFuseTicks(20);
+        creeper.setExplosionRadius(30);
         creeper.setHealth(creeperhealth);
         creeper.setCustomName(ChatColor.GREEN + "CORE");
         creeper.setRemoveWhenFarAway(false);
@@ -243,6 +246,9 @@ public class GameManager {
             players.get(i).setSaturation(0);
             killMap.put(players.get(i), 0);
         }
+        initBossBar();
+        initTimer();
+        initCreeper();
     }
 
     private void setDefaultInventory(Player player, int team) { // 0 - Defender, 1 - Attacker
@@ -284,10 +290,16 @@ public class GameManager {
             @Override
             public void run() {
                 if(creeper.isDead()) {
+                    bossBar.setProgress(0 / creeper.getMaxHealth());
                     bossBar.setVisible(false);
                     bossBar.removeAll();
+                    Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            endGame(1);
+                        }
+                    }, 40L);
                     cancel();
-                    endGame(1);
                     return;
                 }
                 bossBar.setProgress(creeper.getHealth() / creeper.getMaxHealth());
@@ -354,6 +366,9 @@ public class GameManager {
                         if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
                             if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
                                 WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
+                                if(player.getName().equals(event.getPlayer().getName())){
+                                    return;
+                                }
                                 if (watcher.getWatchableObjects().stream()
                                         .map(WrappedWatchableObject::getValue)
                                         .filter(Byte.class::isInstance)
@@ -387,6 +402,7 @@ public class GameManager {
     }
 
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers
+        gameEnded = false;
         gameStarted = false;
         for(Player p : players) {
             p.setLevel(0);
@@ -421,6 +437,18 @@ public class GameManager {
         return gameStarted;
     }
 
+    public void setGameStarted(boolean gameStarted) {
+        this.gameStarted = gameStarted;
+    }
+
+    public boolean isGameEnded() {
+        return gameEnded;
+    }
+
+    public void setGameEnded(boolean gameEnded) {
+        this.gameEnded = gameEnded;
+    }
+
     public HashMap<Player, Integer> getKillMap() {
         return killMap;
     }
@@ -428,6 +456,7 @@ public class GameManager {
     public Creeper getCreeper() {
         return creeper;
     }
+
 
     public List<Player> getDefenders() {
         return defenders;
@@ -451,5 +480,9 @@ public class GameManager {
 
     public GameMap getCurrentMap() {
         return currentMap;
+    }
+
+    public HashMap<Block, Boolean> getSpecialBlocks() {
+        return specialBlocks;
     }
 }

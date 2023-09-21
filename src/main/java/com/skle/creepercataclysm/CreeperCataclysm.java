@@ -45,6 +45,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("zonemap").setExecutor(new ZoneMapCommand(  this));
         getCommand("reloadconfig").setExecutor(new ReloadConfigCommand(  this));
         getCommand("cancelzone").setExecutor(new CancelZoneCommand(  this));
+        getCommand("setSpecial").setExecutor(new SpecialBlockCommand(  this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);

@@ -3,6 +3,7 @@ package com.skle.creepercataclysm.listeners;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -15,6 +16,7 @@ import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -79,5 +81,26 @@ public class EntityInteractListener implements Listener {
                 }
             }
          }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        Block block = player.getLocation().subtract(0, 1, 0).getBlock();
+
+        // Check if the player is on the special block
+        if (block.getType() == Material.LIME_CONCRETE && plugin.getGameManager().getSpecialBlocks().containsKey(block) && plugin.getGameManager().getSpecialBlocks().get(block)) {
+            player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 2));
+            block.setType(Material.RED_CONCRETE);
+            plugin.getGameManager().getSpecialBlocks().put(block, false);
+            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    block.setType(Material.LIME_CONCRETE);
+                    plugin.getGameManager().getSpecialBlocks().put(block, true);
+                }
+            }, 300L);
+
+        }
     }
 }
