@@ -6,6 +6,7 @@ import com.skle.creepercataclysm.commands.debug.*;
 import com.skle.creepercataclysm.listeners.*;
 import com.skle.creepercataclysm.managers.*;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.comphenix.protocol.PacketType;
@@ -62,6 +63,10 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
 
     @Override
     public void onDisable() {
+        ConfigurationSection specialBlocks = config.getConfigurationSection("specialBlocks");
+        specialBlocks.getKeys(false).forEach(key -> {
+            specialBlocks.set(key + ".enabled", true);
+        });
         this.saveConfig();
         if(gameManager.isGameStarted()) {
             gameManager.endGame(0);

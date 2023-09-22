@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -102,20 +103,24 @@ public class EntityInteractListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         Block block = player.getLocation().subtract(0, 1, 0).getBlock();
+        String blockName = "Block" + block.getLocation().getBlockX() + block.getLocation().getBlockY() + block.getLocation().getBlockZ();
+        ConfigurationSection config = plugin.getConfig().getConfigurationSection("specialBlocks");
 
-        // Check if the player is on the special block
-        if (block.getType() == Material.LIME_CONCRETE && plugin.getGameManager().getSpecialBlocks().containsKey(block) && plugin.getGameManager().getSpecialBlocks().get(block)) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 2));
-            block.setType(Material.RED_CONCRETE);
-            plugin.getGameManager().getSpecialBlocks().put(block, false);
-            Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    block.setType(Material.LIME_CONCRETE);
-                    plugin.getGameManager().getSpecialBlocks().put(block, true);
-                }
-            }, 300L);
-
+        if(config.contains(blockName) && player.getWorld().getName().equals(config.getString(blockName + ".world"))) {
+            if(config.getBoolean(blockName + ".enabled")) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 80, 2));
+                block.setType(Material.RED_CONCRETE);
+                config.set(blockName + ".enabled", false);
+                plugin.saveConfig();
+                Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        block.setType(Material.LIME_CONCRETE);
+                        config.set(blockName + ".enabled", true);
+                        plugin.saveConfig();
+                    }
+                }, 300L);
+            }
         }
     }
 }

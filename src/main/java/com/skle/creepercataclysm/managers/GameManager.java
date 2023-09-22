@@ -124,6 +124,7 @@ public class GameManager {
         FileConfiguration config = plugin.getPluginConfig();
         ConfigurationSection lobby = config.getConfigurationSection("lobby");
         ConfigurationSection maps = config.getConfigurationSection("maps");
+        ConfigurationSection specialBlocks = config.getConfigurationSection("specialBlocks");
         if(maps == null || lobby == null) {
             Bukkit.getLogger().severe("No maps found in config!");
             Bukkit.getLogger().severe("No maps found in config!");
@@ -255,7 +256,7 @@ public class GameManager {
         player.getInventory().clear();
         player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
         player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
-        player.getInventory().setItem(0, new ItemStack(team == 0 ? Material.WOODEN_SWORD : Material.STONE_SWORD));
+        player.getInventory().setItem(0, new ItemStack(Material.WOODEN_SWORD));
         player.getInventory().setItem(1, new ItemStack(Material.BOW));
         player.getInventory().setItem(2, new ItemStack(Material.FISHING_ROD));
         player.getInventory().setItem(3, new ItemStack(Material.COOKED_BEEF, 8));
@@ -343,6 +344,9 @@ public class GameManager {
         if(timeLeft <= (totalTime / 2)){
             for(Player p : attackers) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+            }
+            for(Player p : defenders) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
             }
         }
     }
