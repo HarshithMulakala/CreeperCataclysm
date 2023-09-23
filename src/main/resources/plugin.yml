@@ -56,3 +56,7 @@ commands:
     description: Set the block to healing item
     usage: /<command>
     aliases: []
+  creepercommands:
+    description: List all the commands
+    usage: /<command>
+    aliases: [cc, helpcreeper]
