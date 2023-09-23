@@ -57,8 +57,6 @@ public class GameManager {
 
     private Team seeGlow;
 
-    private static final HashMap<Block, Boolean> specialBlocks = new HashMap<>();
-
 
     private Creeper creeper;
     private BossBar bossBar;
@@ -484,9 +482,5 @@ public class GameManager {
 
     public GameMap getCurrentMap() {
         return currentMap;
-    }
-
-    public HashMap<Block, Boolean> getSpecialBlocks() {
-        return specialBlocks;
     }
 }

@@ -31,6 +31,7 @@ public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void EntityExplode(EntityExplodeEvent event){
+        if(!(plugin.getGameManager().isGameStarted())) return;
         if(event.getEntity() instanceof Creeper creeper) {
             event.blockList().clear();
             for (Entity entity : creeper.getNearbyEntities(creeper.getExplosionRadius(), creeper.getExplosionRadius(), creeper.getExplosionRadius())) {

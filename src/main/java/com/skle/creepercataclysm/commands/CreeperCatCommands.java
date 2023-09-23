@@ -19,7 +19,7 @@ public class CreeperCatCommands implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        player.sendMessage(ChatColor.GREEN + "CreeperCataclysm commands:\n- /play : Join the current game queue\n- /queue : Gets current queue\n- /leave : Leave queue. Only works if you are in the current queue\n- /setplayers : Set the max number of players for the game\n- /settime <Int> : Sets the time of the game to <Int>. Only works when in game\n- /abort : Ends the current game\n- /forcestart : Starts the game no matter the amount of players in the queue\n- /addgold <Int> : Adds <Int> amount of gold to the player\n- /zonemap : Gives player a zoning stick to zone new maps\n- /reloadconfig : Reloads config for when manual changes are made\n- /cancelzone : Cancels zoning if player currently zoning\n- /setspecial : Sets gray concrete to healing block");
+        player.sendMessage(ChatColor.GREEN + "CreeperCataclysm commands:\n- /play : Join the current game queue\n- /queue : Gets current queue\n- /leave : Leave queue. Only works if you are in the current queue\n- /setplayers : Set the max number of players for the game\n- /settime <Int> : Sets the time of the game to <Int>. Only works when in game\n- /abort : Ends the current game\n- /forcestart : Starts the game no matter the amount of players in the queue\n- /addgold <Int> : Adds <Int> amount of gold to the player\n - /zonelobby : Give player a zoning stick to zone the lobby \n- /zonemap : Gives player a zoning stick to zone new maps\n- /reloadconfig : Reloads config for when manual changes are made\n- /cancelzone : Cancels zoning if player currently zoning\n- /setspecial : Sets gray concrete to healing block");
         return true;
     }
 }

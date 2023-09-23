@@ -61,7 +61,6 @@ public class InventoryListener implements Listener {
         if (event.getItemInHand().getType().equals(Material.GRAY_CONCRETE) && event.getItemInHand().getItemMeta().getDisplayName().equals("Healing Station Block")) {
             event.getBlock().setType(Material.LIME_CONCRETE);
             saveBlockToConfig("specialBlocks." + "Block" + event.getBlock().getLocation().getBlockX() + event.getBlock().getLocation().getBlockY() + event.getBlock().getLocation().getBlockZ(), event.getBlock());
-            plugin.getGameManager().getSpecialBlocks().put(event.getBlock(), true);
         }
     }
 
