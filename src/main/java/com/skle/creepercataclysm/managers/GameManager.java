@@ -198,7 +198,6 @@ public class GameManager {
         creeper.setExplosionRadius(30);
         creeper.setHealth(creeperhealth);
         creeper.setCustomName(ChatColor.GREEN + "CORE");
-        creeper.setRemoveWhenFarAway(false);
     }
 
     private void initPlayers() {
