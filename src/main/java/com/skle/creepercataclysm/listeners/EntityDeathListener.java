@@ -34,11 +34,7 @@ public class EntityDeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         EntityDamageEvent e = event.getEntity().getLastDamageCause();
-        if(e == null) return;
-        if(!(e instanceof EntityDamageByEntityEvent damageEvent)) return;
-        Object damager = damageEvent.getDamager();
-        if(damager instanceof Arrow arrow) damager = arrow.getShooter();
-        if(!(damager instanceof Player attacker)) return;
+        Player attacker = event.getEntity().getKiller();
         Player victim = event.getEntity();
         if(!(plugin.getGameManager().getPlayers().contains(attacker) && plugin.getGameManager().getPlayers().contains(victim))) return;
         if(plugin.getGameManager().getKillMap().get(attacker) < 3){
