@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -79,5 +80,10 @@ public class InventoryListener implements Listener {
             specialBlocks.set(blockName, null);
             plugin.reloadPluginConfig();
         }
+    }
+
+    @EventHandler
+    public void onFoodChange(FoodLevelChangeEvent event){
+        event.setCancelled(true);
     }
 }
