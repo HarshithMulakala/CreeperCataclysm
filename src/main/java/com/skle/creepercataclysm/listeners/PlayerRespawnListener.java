@@ -64,5 +64,7 @@ public class PlayerRespawnListener implements Listener {
         else{
             victim.teleport(plugin.getGameManager().getCurrentMap().attackerspawn);
         }
+        victim.setHealth(victim.getHealth() + (victim.getHealth() > 16 ? (20 - victim.getHealth()) : 4));
+
     }
 }
