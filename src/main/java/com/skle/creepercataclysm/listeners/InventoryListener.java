@@ -49,8 +49,10 @@ public class InventoryListener implements Listener {
         Inventory actionInventory = event.getClickedInventory();
         if(actionInventory == null) return;
         if(event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-            event.setCancelled(true);
-            return;
+            if(plugin.getShopManager().getDefenderShop().getViewers().contains(player) || plugin.getShopManager().getAttackerShop().getViewers().contains(player)){
+                event.setCancelled(true);
+                return;
+            }
         }
         if(!(actionInventory.equals(plugin.getShopManager().getDefenderShop())) && !(actionInventory.equals(plugin.getShopManager().getAttackerShop()))) return;
         for(InventoryAction action : actions) {

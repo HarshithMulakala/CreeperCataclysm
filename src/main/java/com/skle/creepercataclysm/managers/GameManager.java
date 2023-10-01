@@ -263,13 +263,14 @@ public class GameManager {
         player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
         player.getInventory().setItem(i, new ItemStack(Material.WOODEN_SWORD));
         i++;
+        player.getInventory().setItem(i, new ItemStack(Material.FISHING_ROD));
+        i++;
         if(!currentMap.name.equals("Scorched Earth")){
             player.getInventory().setItem(i, new ItemStack(Material.BOW));
             i++;
+            player.getInventory().setItem(i, new ItemStack(Material.ARROW, (team == 0 ? 3 : 5)));
         }
-        player.getInventory().setItem(i, new ItemStack(Material.FISHING_ROD));
-        i++;
-        player.getInventory().setItem(i, new ItemStack(Material.ARROW, (team == 0 ? 3 : 5)));
+
 
         ItemStack goldIngot = new ItemStack(Material.GOLD_INGOT, 1); // TODO: This doesn't work, from looks of it not possible anymore
         goldIngot.setAmount(0);

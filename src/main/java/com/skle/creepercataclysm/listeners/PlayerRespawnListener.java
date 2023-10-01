@@ -65,6 +65,11 @@ public class PlayerRespawnListener implements Listener {
             victim.teleport(plugin.getGameManager().getCurrentMap().attackerspawn);
         }
         victim.setHealth(victim.getHealth() + (victim.getHealth() > 16 ? (20 - victim.getHealth()) : 4));
-
+        for (ItemStack item : victim.getInventory().getContents()) {
+            if (item == null) continue;
+            if (item.getType() == Material.GOAT_HORN) {
+                item.setAmount(item.getAmount() - 1);
+            }
+        }
     }
 }
