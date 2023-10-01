@@ -27,9 +27,10 @@ public class PlayerRespawnListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         if(!plugin.getGameManager().getPlayers().contains(event.getEntity())) return;
+        if(plugin.getGameManager().getCurrentMap().name.equals("Scorched Earth")) return;
+
         Player victim = event.getEntity();
         //Set the victim's steak to 8 and arrows to 5
-        ItemStack steak = new ItemStack(Material.COOKED_BEEF, 8);
         ItemStack arrows;
         if(plugin.getGameManager().getDefenders().contains(victim)){
             arrows = new ItemStack(Material.ARROW, 3);
@@ -41,14 +42,10 @@ public class PlayerRespawnListener implements Listener {
         }
         for(ItemStack item : victim.getInventory().getContents()){
             if(item == null) continue;
-            if(item.getType() == Material.COOKED_BEEF) {
-                steak.setAmount(steak.getAmount() - item.getAmount());
-            }
-            else if(item.getType() == Material.ARROW) {
+            if(item.getType() == Material.ARROW) {
                 arrows.setAmount(arrows.getAmount() - item.getAmount());
             }
         }
-        victim.getInventory().addItem(steak);
         victim.getInventory().addItem(arrows);
 
     }
