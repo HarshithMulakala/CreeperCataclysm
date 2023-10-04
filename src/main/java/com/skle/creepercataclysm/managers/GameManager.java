@@ -19,6 +19,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -290,6 +291,9 @@ public class GameManager {
             if(item != null && item.getData() != null && item.getType() != Material.ARROW && item.getType() != Material.COOKED_BEEF) {
                 ItemMeta meta = item.getItemMeta();
                 meta.setUnbreakable(true);
+                if(item.getType().equals(Material.LEATHER_CHESTPLATE) || item.getType().equals(Material.LEATHER_HELMET) || item.getType().equals(Material.IRON_LEGGINGS) || item.getType().equals(Material.IRON_BOOTS)) {
+                    meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+                }
                 item.setItemMeta(meta);
             }
         }
