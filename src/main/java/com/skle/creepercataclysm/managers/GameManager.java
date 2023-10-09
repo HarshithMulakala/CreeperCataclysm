@@ -50,6 +50,10 @@ public class GameManager {
     private List<Player> attackers = new ArrayList<>();
 
     private HashMap<Player, Integer> killMap = new HashMap<>();
+    private int attackerGoldStart = 0;
+    private int defenderGoldStart = 0;
+
+    private int creeperhealth;
     private ScoreboardManager manager;
 
     private Scoreboard board;
@@ -193,7 +197,7 @@ public class GameManager {
         creeper = currentMap.creeperspawn.getWorld().spawn(currentMap.creeperspawn, Creeper.class);
         creeper.setPowered(true);
         creeper.setAI(false);
-        int creeperhealth = 500 + (100 * attackers.size());
+        creeperhealth = 500 + (100 * attackers.size());
         creeper.setMaxHealth(creeperhealth);
         creeper.setMaxFuseTicks(20);
         creeper.setExplosionRadius(30);
@@ -336,7 +340,7 @@ public class GameManager {
             @Override
             public void run() {
                 checkPowerups();
-                notifyTimeLeft();
+                checkTimeLeft();
                 if(timeLeft == 0 || !isGameStarted()) {
                     endGame(0);
                     cancel();
@@ -352,7 +356,7 @@ public class GameManager {
     }
 
     private void checkPowerups() {
-        if(timeLeft <= totalTime && timeLeft > (totalTime / 2)){
+        if(timeLeft <= totalTime){
             for(Player p : attackers) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
             }
@@ -362,7 +366,48 @@ public class GameManager {
         }
     }
 
-    private void notifyTimeLeft() {
+    private void checkTimeLeft() {
+        if((plugin.getGameManager().getTimeLeft() <= (.75 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() > (0.875 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getAttackerGoldStart() < 1 || plugin.getGameManager().getAttackerGoldStart() == 1)){
+            if(plugin.getGameManager().getAttackerGoldStart() == 1){
+
+            }
+            else{
+                plugin.getGameManager().setAttackerGoldStart(1);
+                for(Player player : plugin.getGameManager().getAttackers()){
+                    player.sendMessage(ChatColor.RED + "Comeback buff activated +1 gold per kill!");
+                    plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) + 1);
+                }
+            }
+
+        }
+        else if(plugin.getGameManager().getAttackerGoldStart() == 1){
+            plugin.getGameManager().setAttackerGoldStart(0);
+            for(Player player : plugin.getGameManager().getAttackers()){
+                player.sendMessage(ChatColor.RED + "Comeback buff deactivated regular gold per kill!");
+                plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) - 1);
+            }
+        }
+
+        if((plugin.getGameManager().getTimeLeft() >= (.5 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() < (0.5 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getDefenderGoldStart() < 1 || plugin.getGameManager().getDefenderGoldStart() == 1)){
+            if(plugin.getGameManager().getDefenderGoldStart() == 1){
+
+            }
+            else{
+                plugin.getGameManager().setDefenderGoldStart(1);
+                for(Player player : plugin.getGameManager().getDefenders()){
+                    player.sendMessage(ChatColor.BLUE + "Comeback buff activated +1 gold per kill!");
+                    plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) + 1);
+                }
+            }
+        }
+        else if(plugin.getGameManager().getDefenderGoldStart() == 1){
+            plugin.getGameManager().setDefenderGoldStart(0);
+            for(Player player : plugin.getGameManager().getDefenders()){
+                player.sendMessage(ChatColor.BLUE + "Comeback buff deactivated regular gold per kill!");
+                plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) - 1);
+            }
+        }
+
         if(timeLeft == 60){
             for(Player p : players) {
                 p.sendTitle(ChatColor.RED + "1 Minute Remaining!", "", 10, 40, 10);
@@ -489,8 +534,36 @@ public class GameManager {
         this.timeLeft = timeLeft;
     }
 
+    public int getAttackerGoldStart() {
+        return attackerGoldStart;
+    }
+
+    public void setAttackerGoldStart(int attackerGoldStart) {
+        this.attackerGoldStart = attackerGoldStart;
+    }
+
+    public int getDefenderGoldStart() {
+        return defenderGoldStart;
+    }
+
+    public void setDefenderGoldStart(int defenderGoldStart) {
+        this.defenderGoldStart = defenderGoldStart;
+    }
+
     public int getTimeLeft() {
         return timeLeft;
+    }
+
+    public int getTotalTime() {
+        return totalTime;
+    }
+
+    public int getMaxCreeperHealth() {
+        return creeperhealth;
+    }
+
+    public double getCreeperhealth() {
+        return creeper.getHealth();
     }
 
     public GameMap getCurrentMap() {

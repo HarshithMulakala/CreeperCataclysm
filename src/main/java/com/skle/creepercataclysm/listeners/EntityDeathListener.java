@@ -1,6 +1,7 @@
 package com.skle.creepercataclysm.listeners;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -38,10 +39,19 @@ public class EntityDeathListener implements Listener {
         Player victim = event.getEntity();
         if(attacker.equals(victim)) return;
         if(!(plugin.getGameManager().getPlayers().contains(attacker) && plugin.getGameManager().getPlayers().contains(victim))) return;
-        if(plugin.getGameManager().getKillMap().get(attacker) < 3){
-            plugin.getGameManager().getKillMap().put(attacker, plugin.getGameManager().getKillMap().get(attacker) + 1);
+        if(plugin.getGameManager().getDefenders().contains(attacker)){
+            if(plugin.getGameManager().getKillMap().get(attacker) < plugin.getGameManager().getDefenderGoldStart() + 3){
+                plugin.getGameManager().getKillMap().put(attacker, plugin.getGameManager().getKillMap().get(attacker) + 1);
+
+            }
         }
+        else{
+            if(plugin.getGameManager().getKillMap().get(attacker) < plugin.getGameManager().getAttackerGoldStart() + 3){
+                plugin.getGameManager().getKillMap().put(attacker, plugin.getGameManager().getKillMap().get(attacker) + 1);
+            }
+        }
+        double health = attacker.getHealth() + 4 < 20 ? 4 : 20 - attacker.getHealth();
+        attacker.setHealth(attacker.getHealth() + health);
         plugin.getGoldManager().addGold(attacker, plugin.getGameManager().getKillMap().get(attacker));
-        plugin.getGameManager().getKillMap().put(victim, 0);
     }
 }

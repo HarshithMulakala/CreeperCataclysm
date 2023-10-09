@@ -68,5 +68,11 @@ public class PlayerRespawnListener implements Listener {
                 item.setAmount(item.getAmount() - 1);
             }
         }
+        if(plugin.getGameManager().getDefenders().contains(victim)){
+            plugin.getGameManager().getKillMap().put(victim, plugin.getGameManager().getDefenderGoldStart());
+        }
+        else{
+            plugin.getGameManager().getKillMap().put(victim, plugin.getGameManager().getAttackerGoldStart());
+        }
     }
 }
