@@ -61,3 +61,7 @@ commands:
     description: List all the commands
     usage: /<command>
     aliases: [cc, helpcreeper]
+  resetdeaths:
+    description: Reset the deaths of all players
+    usage: /<command>
+    aliases: [rd]

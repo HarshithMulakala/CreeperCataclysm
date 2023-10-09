@@ -63,7 +63,7 @@ public class ShopManager {
                     15, 6, "Shield", "A shield that can be used to block attacks.",
                     new Material[]{}),
             new ShopItem(Material.GOAT_HORN,
-                    15, 7, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
+                    7, 7, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
                     new Material[]{})
     };
 
@@ -104,7 +104,7 @@ public class ShopManager {
                     15, 6, "Shield", "A shield that can be used to block attacks.",
                     new Material[]{}),
             new ShopItem(Material.GOAT_HORN,
-                    15, 7, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
+                    7, 7, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
                     new Material[]{})
     };
 
@@ -146,9 +146,6 @@ public class ShopManager {
             ItemMeta purchaseMeta = purchaseStack.getItemMeta();
             purchaseMeta.setDisplayName("§r" + name);
             purchaseMeta.setUnbreakable(true);
-            if(item == Material.GOAT_HORN){
-                purchaseMeta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
-            }
             purchaseStack.setItemMeta(purchaseMeta);
         }
     }

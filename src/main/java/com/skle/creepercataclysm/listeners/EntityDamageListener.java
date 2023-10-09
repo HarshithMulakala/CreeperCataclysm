@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class EntityDamageListener implements Listener {
@@ -98,13 +99,13 @@ public class EntityDamageListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) throws InterruptedException {
-        if(!plugin.getGameManager().isGameStarted()) return;
         if(event.getEntity() instanceof Player) {
             if(event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setCancelled(true);
             }
         }
 
+        if(!plugin.getGameManager().isGameStarted()) return;
         if(event.getEntity().equals(plugin.getGameManager().getCreeper())) {
             if(plugin.getGameManager().getCreeper().getHealth() - event.getDamage() <= 0) {
                 event.setCancelled(true);
@@ -140,12 +141,41 @@ public class EntityDamageListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerHitPlayer(EntityDamageByEntityEvent event){
+    public void onPlayerHitPlayerEnd(EntityDamageByEntityEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         if(!plugin.getGameManager().isGameEnded()) return;
         if(event.getEntity() instanceof Player a && event.getDamager() instanceof Player b){
             if(plugin.getGameManager().getPlayers().contains(a) && plugin.getGameManager().getPlayers().contains(b)){
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    public void updateDamage(Player attacker, Player victim, double damage) {
+        if (plugin.getGameManager().getDamageMap().containsKey(victim)) {
+            HashMap<Player, Double> victimDamageMap = plugin.getGameManager().getDamageMap().get(victim);
+
+            if (victimDamageMap.containsKey(attacker)) {
+                double currentDamage = victimDamageMap.get(attacker);
+                victimDamageMap.put(attacker, currentDamage + damage);
+            } else {
+                victimDamageMap.put(attacker, damage);
+            }
+        } else {
+            HashMap<Player, Double> victimDamageMap = new HashMap<>();
+            victimDamageMap.put(attacker, damage);
+
+            plugin.getGameManager().getDamageMap().put(victim, victimDamageMap);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerHitPlayer(EntityDamageByEntityEvent event){
+        if(!plugin.getGameManager().isGameStarted()) return;
+        if(event.getDamager().equals(event.getEntity())) return;
+        if(event.getEntity() instanceof Player victim && event.getDamager() instanceof Player attacker){
+            if(plugin.getGameManager().getPlayers().contains(victim) && plugin.getGameManager().getPlayers().contains(attacker)){
+                updateDamage(attacker, victim, event.getDamage());
             }
         }
     }

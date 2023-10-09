@@ -21,6 +21,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,9 +29,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
@@ -49,7 +48,10 @@ public class GameManager {
     private List<Player> defenders = new ArrayList<>();
     private List<Player> attackers = new ArrayList<>();
 
+    private HashMap<Player, Integer> playerKillMap = new HashMap<>();
     private HashMap<Player, Integer> killMap = new HashMap<>();
+    private HashMap<Player, HashMap<Player, Double>> damageMap = new HashMap<>();
+
     private int attackerGoldStart = 0;
     private int defenderGoldStart = 0;
 
@@ -150,8 +152,11 @@ public class GameManager {
     public void startGame() {
         manager = Bukkit.getScoreboardManager();
         board = manager.getMainScoreboard();
+        board.clearSlot(DisplaySlot.SIDEBAR);
         gameEnded = false;
+        damageMap = new HashMap<>();
         killMap = new HashMap<>();
+        playerKillMap = new HashMap<>();
         if(board.getTeam("attackers") != null) {
             scoreAttackers = board.getTeam("attackers");
         }
@@ -273,7 +278,7 @@ public class GameManager {
         if(!currentMap.name.equals("Scorched Earth")){
             player.getInventory().setItem(i, new ItemStack(Material.BOW));
             i++;
-            player.getInventory().setItem(i, new ItemStack(Material.ARROW, (team == 0 ? 3 : 5)));
+            player.getInventory().setItem(i, new ItemStack(Material.ARROW, 3));
         }
 
 
@@ -464,6 +469,7 @@ public class GameManager {
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers
         gameEnded = false;
         gameStarted = false;
+        playerKillMap = new HashMap<>();
         for(Player p : players) {
             p.setLevel(0);
             p.setExp(0);
@@ -474,6 +480,13 @@ public class GameManager {
                 p.removePotionEffect(effect.getType());
             }
             p.setGameMode(GameMode.ADVENTURE);
+            ItemStack knockbackstick = new ItemStack(Material.STICK);
+            ItemMeta stickmeta = knockbackstick.getItemMeta();
+            stickmeta.setDisplayName(ChatColor.RED + "Knockback Stick");
+            stickmeta.addEnchant(Enchantment.KNOCKBACK, 10, true);
+            knockbackstick.setItemMeta(stickmeta);
+            p.getInventory().addItem(knockbackstick);
+            p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3));
         }
         for (String playerName : scoreAttackers.getEntries()) {
             scoreAttackers.removeEntry(playerName);
@@ -491,6 +504,13 @@ public class GameManager {
         plugin.getQueueManager().resetQueue();
         plugin.getGoldManager().resetGame();
         plugin.getShopManager().resetShop();
+        board.getObjective("deaths").unregister();
+        board.registerNewObjective("deaths", "deathCount", ChatColor.RED + "Deaths");
+        board.getObjective("deaths").setDisplaySlot(DisplaySlot.SIDEBAR);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            Score deathsScore = board.getObjective("deaths").getScore(player.getName());
+            deathsScore.setScore(0);
+        }
     }
 
     public boolean isGameStarted() {
@@ -511,6 +531,14 @@ public class GameManager {
 
     public HashMap<Player, Integer> getKillMap() {
         return killMap;
+    }
+
+    public HashMap<Player, Integer> getPlayerKillMap() {
+        return playerKillMap;
+    }
+
+    public HashMap<Player, HashMap<Player, Double>> getDamageMap() {
+        return damageMap;
     }
 
     public Creeper getCreeper() {
