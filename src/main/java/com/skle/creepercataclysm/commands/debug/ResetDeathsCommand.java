@@ -1,4 +1,4 @@
-package com.skle.creepercataclysm.commands;
+package com.skle.creepercataclysm.commands.debug;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;

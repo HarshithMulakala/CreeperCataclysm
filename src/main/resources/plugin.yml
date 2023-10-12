@@ -61,6 +61,10 @@ commands:
     description: List all the commands
     usage: /<command>
     aliases: [cc, helpcreeper]
+  switchteam:
+    description: Switch teams
+    usage: /<command>
+    aliases: [st]
   resetdeaths:
     description: Reset the deaths of all players
     usage: /<command>

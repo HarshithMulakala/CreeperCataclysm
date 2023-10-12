@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
@@ -50,6 +49,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("setSpecial").setExecutor(new SpecialBlockCommand(  this));
         getCommand("creepercommands").setExecutor(new CreeperCatCommands(this));
         getCommand("resetdeaths").setExecutor(new ResetDeathsCommand(this));
+        getCommand("switchteam").setExecutor(new SwitchTeamsCommand(this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);

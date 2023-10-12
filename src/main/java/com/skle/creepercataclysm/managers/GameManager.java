@@ -266,7 +266,7 @@ public class GameManager {
         }, 40L);
     }
 
-    private void setDefaultInventory(Player player, int team) { // 0 - Defender, 1 - Attacker
+    public void setDefaultInventory(Player player, int team) { // 0 - Defender, 1 - Attacker
         int i = 0;
         player.getInventory().clear();
         player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
