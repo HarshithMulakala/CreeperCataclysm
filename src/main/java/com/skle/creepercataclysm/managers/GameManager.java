@@ -385,6 +385,32 @@ public class GameManager {
             }
 
         }
+        else if((plugin.getGameManager().getTimeLeft() <= (.5 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() > (0.6 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getCreeperhealth() <= (0.875 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getAttackerGoldStart() < 1 || plugin.getGameManager().getAttackerGoldStart() == 1)){
+            if(plugin.getGameManager().getAttackerGoldStart() == 1){
+
+            }
+            else{
+                plugin.getGameManager().setAttackerGoldStart(1);
+                for(Player player : plugin.getGameManager().getAttackers()){
+                    player.sendMessage(ChatColor.RED + "Comeback buff activated +1 gold per kill!");
+                    plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) + 1);
+                }
+            }
+
+        }
+        else if((plugin.getGameManager().getTimeLeft() <= (.2 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() >= (0.35 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getAttackerGoldStart() < 1 || plugin.getGameManager().getAttackerGoldStart() == 1)){
+            if(plugin.getGameManager().getAttackerGoldStart() == 1){
+
+            }
+            else{
+                plugin.getGameManager().setAttackerGoldStart(1);
+                for(Player player : plugin.getGameManager().getAttackers()){
+                    player.sendMessage(ChatColor.RED + "Comeback buff activated +1 gold per kill!");
+                    plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) + 1);
+                }
+            }
+
+        }
         else if(plugin.getGameManager().getAttackerGoldStart() == 1){
             plugin.getGameManager().setAttackerGoldStart(0);
             for(Player player : plugin.getGameManager().getAttackers()){
@@ -394,6 +420,18 @@ public class GameManager {
         }
 
         if((plugin.getGameManager().getTimeLeft() >= (.5 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() < (0.5 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getDefenderGoldStart() < 1 || plugin.getGameManager().getDefenderGoldStart() == 1)){
+            if(plugin.getGameManager().getDefenderGoldStart() == 1){
+
+            }
+            else{
+                plugin.getGameManager().setDefenderGoldStart(1);
+                for(Player player : plugin.getGameManager().getDefenders()){
+                    player.sendMessage(ChatColor.BLUE + "Comeback buff activated +1 gold per kill!");
+                    plugin.getGameManager().getKillMap().put(player, plugin.getGameManager().getKillMap().get(player) + 1);
+                }
+            }
+        }
+        else if((plugin.getGameManager().getTimeLeft() >= (.3 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() < (0.2 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getDefenderGoldStart() < 1 || plugin.getGameManager().getDefenderGoldStart() == 1)){
             if(plugin.getGameManager().getDefenderGoldStart() == 1){
 
             }
@@ -444,19 +482,18 @@ public class GameManager {
                                 }
                                 if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
                                     WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
-                                    // Collect if the entity is already glowing.
                                     byte data = watcher.getByte(0);
                                     data |= 1 << 6;
                                     wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
                                     wrapper.setEntityID(event.getPlayer().getEntityId());
                                     wrapper.sendPacket(player);
                                 }
-                                else {
-                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
-                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
-                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
-                                    newwrapper.sendPacket(player);
-                                }
+//                                else {
+//                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
+//                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
+//                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
+//                                    newwrapper.sendPacket(player);
+//                                }
                             }
                         }
                     }

@@ -17,10 +17,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EntityDeathListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -42,6 +39,7 @@ public class EntityDeathListener implements Listener {
     public void onPlayerDeathForSounds(PlayerDeathEvent event){
         Player attacker = event.getEntity().getKiller();
         Player victim = event.getEntity();
+        if(attacker == null) return;
         if(attacker.equals(victim)) return;
         if(plugin.getGameManager().getPlayerKillMap().get(attacker) == null){
             plugin.getGameManager().getPlayerKillMap().put(attacker, 0);
@@ -115,7 +113,9 @@ public class EntityDeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         if(event.getEntity().getKiller() == null){
-            for (Map.Entry<Player, Double> entry : plugin.getGameManager().getDamageMap().get(event.getEntity()).entrySet()) {
+            HashMap<Player, Double> damageMap = plugin.getGameManager().getDamageMap().get(event.getEntity());
+            if(damageMap == null || damageMap.isEmpty()) return;
+            for (Map.Entry<Player, Double> entry : damageMap.entrySet()) {
                 plugin.getGoldManager().addGoldNug(entry.getKey(), 1);
             }
             return;
@@ -141,15 +141,19 @@ public class EntityDeathListener implements Listener {
         attacker.setHealth(attacker.getHealth() + health);
         plugin.getGoldManager().addGold(attacker, plugin.getGameManager().getKillMap().get(attacker));
         plugin.getGameManager().getDamageMap().get(victim).remove(attacker);
-        double max = Collections.max(plugin.getGameManager().getDamageMap().get(victim).values());
-        Bukkit.getLogger().info("Second Damager: " + max);
-        if(max >= 11.5){
-            for (Map.Entry<Player, Double> entry : plugin.getGameManager().getDamageMap().get(victim).entrySet()) {
-                if (entry.getValue()==max) {
-                    plugin.getGoldManager().addGoldNug(entry.getKey(), 1);
+        HashMap<Player, Double> damageMap = plugin.getGameManager().getDamageMap().get(event.getEntity());
+        if(damageMap != null && !damageMap.isEmpty()){
+            double max = Collections.max(plugin.getGameManager().getDamageMap().get(victim).values());
+            Bukkit.getLogger().info("Second Damager: " + max);
+            if(max >= 11.5){
+                for (Map.Entry<Player, Double> entry : plugin.getGameManager().getDamageMap().get(victim).entrySet()) {
+                    if (entry.getValue()==max) {
+                        plugin.getGoldManager().addGoldNug(entry.getKey(), 1);
+                    }
                 }
             }
         }
+
 
     }
 }
