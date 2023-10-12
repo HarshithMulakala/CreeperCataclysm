@@ -149,6 +149,7 @@ public class EntityDeathListener implements Listener {
                 for (Map.Entry<Player, Double> entry : plugin.getGameManager().getDamageMap().get(victim).entrySet()) {
                     if (entry.getValue()==max) {
                         plugin.getGoldManager().addGoldNug(entry.getKey(), 1);
+                        event.setDeathMessage(event.getDeathMessage() + " assisted by " + entry.getKey().getName());
                     }
                 }
             }
