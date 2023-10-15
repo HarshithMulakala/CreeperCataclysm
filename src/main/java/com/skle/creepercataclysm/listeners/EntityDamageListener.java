@@ -57,6 +57,7 @@ public class EntityDamageListener implements Listener {
                 attacker = player;
                 if((!(plugin.getGameManager().getAttackers().contains(attacker) && plugin.getGameManager().getAttackers().contains(attacked))) && (!(plugin.getGameManager().getDefenders().contains(attacker) && plugin.getGameManager().getDefenders().contains(attacked))) ){
                     attacker.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                    updateDamage(attacker, attacked, event.getDamage());
                 }
 
             }
@@ -99,9 +100,12 @@ public class EntityDamageListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) throws InterruptedException {
-        if(event.getEntity() instanceof Player) {
+        if(event.getEntity() instanceof Player player) {
             if(event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setCancelled(true);
+                if(player.getLocation().getY() == -60 && player.getLocation().getBlock().getType() == Material.LAVA){
+                    player.setHealth(0);
+                }
             }
         }
 
@@ -173,6 +177,9 @@ public class EntityDamageListener implements Listener {
     public void onPlayerHitPlayer(EntityDamageByEntityEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         if(event.getDamager().equals(event.getEntity())) return;
+        if(event.getEntity().equals(plugin.getGameManager().getCreeper()) && event.getDamager() instanceof Player attacker) {
+            plugin.getGameManager().getTotalCreeperDamage().put(attacker, plugin.getGameManager().getTotalCreeperDamage().get(attacker) + event.getDamage());
+        }
         if(event.getEntity() instanceof Player victim && event.getDamager() instanceof Player attacker){
             if(plugin.getGameManager().getPlayers().contains(victim) && plugin.getGameManager().getPlayers().contains(attacker)){
                 updateDamage(attacker, victim, event.getDamage());

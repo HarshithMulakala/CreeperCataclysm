@@ -50,6 +50,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("creepercommands").setExecutor(new CreeperCatCommands(this));
         getCommand("resetdeaths").setExecutor(new ResetDeathsCommand(this));
         getCommand("switchteam").setExecutor(new SwitchTeamsCommand(this));
+        getCommand("tpsnow").setExecutor(new TeleportSnowCommand(this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);
