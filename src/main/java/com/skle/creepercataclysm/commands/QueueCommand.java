@@ -19,12 +19,22 @@ public class QueueCommand implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        String print = ChatColor.AQUA + "Current players in queue: ";
-        for(Player p : plugin.getQueueManager().getQueue()) {
-            print += p.getName() + ", ";
+        if(plugin.getGameManager().isGameStarted()){
+            String print = ChatColor.AQUA + "Current players in queue: ";
+            for(Player p : plugin.getGameManager().getPlayers()) {
+                print += p.getName() + ", ";
+            }
+            print = print.substring(0, print.length() - 2);
+            player.sendMessage(print);
         }
-        print = print.substring(0, print.length() - 2);
-        player.sendMessage(print);
+        else{
+            String print = ChatColor.AQUA + "Current players in queue: ";
+            for(Player p : plugin.getQueueManager().getQueue()) {
+                print += p.getName() + ", ";
+            }
+            print = print.substring(0, print.length() - 2);
+            player.sendMessage(print);
+        }
         return true;
     }
 }

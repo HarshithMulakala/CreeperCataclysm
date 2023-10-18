@@ -117,9 +117,11 @@ public class EntityInteractListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
                     @Override
                     public void run() {
-                        block.setType(Material.LIME_CONCRETE);
-                        config.set(blockName + ".enabled", true);
-                        plugin.saveConfig();
+                        if(block.getType().equals(Material.RED_CONCRETE)){
+                            block.setType(Material.LIME_CONCRETE);
+                            config.set(blockName + ".enabled", true);
+                            plugin.saveConfig();
+                        }
                     }
                 }, 300L);
             }

@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class EntityDamageListener implements Listener {
@@ -56,7 +58,7 @@ public class EntityDamageListener implements Listener {
                 if(!(arrow.getShooter() instanceof Player player)) return;
                 attacker = player;
                 if((!(plugin.getGameManager().getAttackers().contains(attacker) && plugin.getGameManager().getAttackers().contains(attacked))) && (!(plugin.getGameManager().getDefenders().contains(attacker) && plugin.getGameManager().getDefenders().contains(attacked))) ){
-                    attacker.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                    event.setDamage(event.getDamage()/2);
                     updateDamage(attacker, attacked, event.getDamage());
                 }
 
@@ -184,6 +186,30 @@ public class EntityDamageListener implements Listener {
             if(plugin.getGameManager().getPlayers().contains(victim) && plugin.getGameManager().getPlayers().contains(attacker)){
                 updateDamage(attacker, victim, event.getDamage());
             }
+        }
+    }
+
+    @EventHandler
+    public void playerShootBow(EntityShootBowEvent event){
+        if(!plugin.getGameManager().isGameStarted()) return;
+        if (event.getEntity() instanceof Player player) {
+            if(plugin.getGameManager().getPlayers().contains(player)) {
+                if(plugin.getGameManager().getArrowCooldowns().get(player).isEmpty()){
+                    plugin.getGameManager().getArrowCooldowns().get(player).add(plugin.getGameManager().getTimeLeft() - 15);
+                }
+                else{
+                    plugin.getGameManager().getArrowCooldowns().get(player).add(plugin.getGameManager().getArrowCooldowns().get(player).get(plugin.getGameManager().getArrowCooldowns().get(player).size() - 1) - 15);
+                }
+            }
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if(plugin.getGameManager().getArrowCooldowns().get(player).contains(plugin.getGameManager().getTimeLeft()) && plugin.getGameManager().isGameStarted()){
+                        plugin.getGameManager().getArrowCooldowns().get(player).remove(plugin.getGameManager().getArrowCooldowns().get(player).indexOf(plugin.getGameManager().getTimeLeft()));
+                        player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                    }
+                }
+            }.runTaskTimer(plugin, 0, 20); // Check every second
         }
     }
 }

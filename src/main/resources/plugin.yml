@@ -7,7 +7,7 @@ load: POSTWORLD
 commands:
   play:
     description: Queue up for a game
-    usage: /<command>
+    usage: /<command> <player>
     aliases: [join, p, j]
   queue:
     description: List the players in queue

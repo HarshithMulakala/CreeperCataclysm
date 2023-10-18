@@ -20,10 +20,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -55,6 +52,8 @@ public class GameManager {
 
     private HashMap<Player, Integer> totalKills = new HashMap<>();
     private HashMap<Player, Double> totalCreeperDamage = new HashMap<>();
+
+    private HashMap<Player, List<Integer>> arrowCooldowns = new HashMap<>();
 
     private int attackerGoldStart = 0;
     private int defenderGoldStart = 0;
@@ -317,6 +316,7 @@ public class GameManager {
         damageMap = new HashMap<>();
         killMap = new HashMap<>();
         totalKills = new HashMap<>();
+        arrowCooldowns = new HashMap<>();
         totalCreeperDamage = new HashMap<>();
         playerKillMap = new HashMap<>();
         if(board.getTeam("attackers") != null) {
@@ -417,6 +417,7 @@ public class GameManager {
             killMap.put(players.get(i), 0);
             totalKills.put(players.get(i), 0);
             totalCreeperDamage.put(players.get(i), 0.0);
+            arrowCooldowns.put(players.get(i), new ArrayList<>());
         }
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
@@ -543,6 +544,7 @@ public class GameManager {
     }
 
     private void checkTimeLeft() {
+        if(!isGameStarted()){return;}
         if((plugin.getGameManager().getTimeLeft() <= (.75 * plugin.getGameManager().getTotalTime())) && (plugin.getGameManager().getCreeperhealth() > (0.875 * plugin.getGameManager().getMaxCreeperHealth())) && (plugin.getGameManager().getAttackerGoldStart() < 1 || plugin.getGameManager().getAttackerGoldStart() == 1)){
             if(plugin.getGameManager().getAttackerGoldStart() == 1){
 
@@ -952,6 +954,10 @@ public class GameManager {
 
     public HashMap<Player, Integer> getTotalKills() {
         return totalKills;
+    }
+
+    public HashMap<Player, List<Integer>> getArrowCooldowns(){
+        return arrowCooldowns;
     }
 
     public Creeper getCreeper() {
