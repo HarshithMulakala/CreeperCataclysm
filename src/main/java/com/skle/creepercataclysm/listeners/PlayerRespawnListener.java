@@ -1,9 +1,9 @@
 package com.skle.creepercataclysm.listeners;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -15,13 +15,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Score;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class PlayerRespawnListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -92,5 +97,84 @@ public class PlayerRespawnListener implements Listener {
             plugin.getGameManager().getKillMap().put(victim, plugin.getGameManager().getAttackerGoldStart());
         }
         plugin.getGameManager().getDamageMap().put(victim, new HashMap<>());
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event){
+        if(!plugin.getGameManager().isGameStarted()) return;
+        if(!plugin.getGameManager().getPlayers().contains(event.getPlayer())) return;
+        plugin.getGameManager().getLeftPlayers().put(event.getPlayer().getName(), event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event){
+        if(!plugin.getGameManager().isGameStarted()) {
+            Score deathsScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("deaths").getScore(event.getPlayer().getName());
+            if(!(deathsScore.getScore() > 0)){
+                deathsScore.setScore(0);
+            }
+            if(event.getPlayer().getInventory().getHelmet() != null){
+                if(event.getPlayer().getInventory().getHelmet().getItemMeta() instanceof LeatherArmorMeta helmetMeta){
+                    if(helmetMeta.getColor().equals(Color.RED) || helmetMeta.getColor().equals(Color.BLUE)){
+                        FileConfiguration config = plugin.getPluginConfig();
+                        ConfigurationSection lobby = config.getConfigurationSection("lobby");
+                        Location lobbySpawn = new Location(Bukkit.getWorld(lobby.getString("world")), lobby.getDouble("x"), lobby.getDouble("y"), lobby.getDouble("z"), (float)lobby.getDouble("yaw"), (float)lobby.getDouble("pitch"));
+                        event.getPlayer().teleport(lobbySpawn);
+                        event.getPlayer().setLevel(0);
+                        event.getPlayer().setExp(0);
+                        event.getPlayer().getInventory().clear();
+                        event.getPlayer().setBedSpawnLocation(lobbySpawn, true);
+                        event.getPlayer().setGameMode(GameMode.ADVENTURE);
+                        ItemStack knockbackstick = new ItemStack(Material.STICK);
+                        ItemMeta stickmeta = knockbackstick.getItemMeta();
+                        stickmeta.setDisplayName(ChatColor.RED + "Knockback Stick");
+                        stickmeta.addEnchant(Enchantment.KNOCKBACK, 10, true);
+                        knockbackstick.setItemMeta(stickmeta);
+                        event.getPlayer().getInventory().addItem(knockbackstick);
+                        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3));
+                    }
+                }
+            }
+            return;
+        }
+        if(!plugin.getGameManager().getLeftPlayers().containsKey(event.getPlayer().getName())) return;
+        Player oldPLayer = plugin.getGameManager().getLeftPlayers().get(event.getPlayer().getName());
+        Player newPlayer = event.getPlayer();
+        //true = Defender false = Attacker
+        boolean team = plugin.getGameManager().getDefenders().contains(oldPLayer) ? true : false;
+        plugin.getGameManager().getKillMap().put(newPlayer, plugin.getGameManager().getKillMap().remove(oldPLayer));
+        plugin.getGameManager().getDamageMap().put(newPlayer, plugin.getGameManager().getDamageMap().remove(oldPLayer));
+        plugin.getGameManager().getPlayerKillMap().put(newPlayer, plugin.getGameManager().getPlayerKillMap().remove(oldPLayer));
+        plugin.getGameManager().getTotalKills().put(newPlayer, plugin.getGameManager().getTotalKills().remove(oldPLayer));
+        plugin.getGameManager().getTotalCreeperDamage().put(newPlayer, plugin.getGameManager().getTotalCreeperDamage().remove(oldPLayer));
+        List<Integer> arrows = plugin.getGameManager().getArrowCooldowns().get(oldPLayer);
+        plugin.getGameManager().getArrowCooldowns().remove(oldPLayer);
+        int addArrows = 0;
+        for(int i = arrows.size() - 1; i >= 0 ; i--){
+            if(arrows.get(i) >= plugin.getGameManager().getTimeLeft()){
+                arrows.remove(i);
+                addArrows++;
+            }
+        }
+        int sizeArrow = arrows.size();
+        plugin.getGameManager().getArrowCooldowns().put(newPlayer, arrows);
+        newPlayer.getInventory().addItem(new ItemStack(Material.ARROW, addArrows));
+        if(sizeArrow > 0){
+            plugin.getGameManager().arrowRespawner(newPlayer);
+        }
+        if(team){
+            plugin.getGameManager().getDefenders().remove(oldPLayer);
+            plugin.getGameManager().getDefenders().add(newPlayer);
+            newPlayer.teleport(plugin.getGameManager().getCurrentMap().defenderspawn);
+        }
+        else{
+            plugin.getGameManager().getAttackers().remove(oldPLayer);
+            plugin.getGameManager().getAttackers().add(newPlayer);
+            newPlayer.teleport(plugin.getGameManager().getCurrentMap().attackerspawn);
+        }
+        plugin.getGameManager().getPlayers().remove(oldPLayer);
+        plugin.getGameManager().getPlayers().add(newPlayer);
+        plugin.getGameManager().getLeftPlayers().remove(oldPLayer.getName());
+
     }
 }

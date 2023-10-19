@@ -64,7 +64,6 @@ public class EntityDamageListener implements Listener {
 
             }
             else if(event.getDamager() instanceof Fireball) {
-                Bukkit.getLogger().info("Fireball damage");
                 if(((Fireball) event.getDamager()).getShooter() == attacked) {
                     event.setDamage(1.0);
                 }
@@ -84,17 +83,14 @@ public class EntityDamageListener implements Listener {
     @EventHandler
     public void onHit(ProjectileHitEvent event)
     {
-        Bukkit.getLogger().info("Projectile hit");
         Projectile p = event.getEntity();
         if(p instanceof Arrow) {
             p.remove();
         }
         if(p instanceof Fireball fireball) {
-            Bukkit.getLogger().info("Fireball hit");
             Block blockhit = event.getHitBlock();
             if(blockhit != null && blockhit.getType() == Material.POWDER_SNOW) {
                 event.setCancelled(true);
-                Bukkit.getLogger().info("Fireball hit powder snow");
             }
         }
         return;
@@ -201,15 +197,8 @@ public class EntityDamageListener implements Listener {
                     plugin.getGameManager().getArrowCooldowns().get(player).add(plugin.getGameManager().getArrowCooldowns().get(player).get(plugin.getGameManager().getArrowCooldowns().get(player).size() - 1) - 15);
                 }
             }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if(plugin.getGameManager().getArrowCooldowns().get(player).contains(plugin.getGameManager().getTimeLeft()) && plugin.getGameManager().isGameStarted()){
-                        plugin.getGameManager().getArrowCooldowns().get(player).remove(plugin.getGameManager().getArrowCooldowns().get(player).indexOf(plugin.getGameManager().getTimeLeft()));
-                        player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
-                    }
-                }
-            }.runTaskTimer(plugin, 0, 20); // Check every second
+            plugin.getGameManager().arrowRespawner(player);
+
         }
     }
 }

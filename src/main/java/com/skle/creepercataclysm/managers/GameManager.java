@@ -55,6 +55,8 @@ public class GameManager {
 
     private HashMap<Player, List<Integer>> arrowCooldowns = new HashMap<>();
 
+    private HashMap<String, Player> leftPlayers = new HashMap<>();
+
     private int attackerGoldStart = 0;
     private int defenderGoldStart = 0;
 
@@ -77,6 +79,9 @@ public class GameManager {
     private int totalTime;
 
     private int lastCreeperHitTime;
+
+    private ItemStack[] defenderArmorContents;
+    private ItemStack[] attackerArmorContents;
 
     private List<GameMap> maps;
     private GameMap currentMap;
@@ -317,6 +322,7 @@ public class GameManager {
         killMap = new HashMap<>();
         totalKills = new HashMap<>();
         arrowCooldowns = new HashMap<>();
+        leftPlayers = new HashMap<>();
         totalCreeperDamage = new HashMap<>();
         playerKillMap = new HashMap<>();
         if(board.getTeam("attackers") != null) {
@@ -751,6 +757,20 @@ public class GameManager {
         player.sendMessage(sb.toString() + message);
     }
 
+    public void arrowRespawner(Player player){
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(!plugin.getGameManager().getArrowCooldowns().containsKey(player)) return;
+                if(Bukkit.getPlayer(player.getUniqueId()) == null) return;
+                if(plugin.getGameManager().getArrowCooldowns().get(player).contains(plugin.getGameManager().getTimeLeft()) && plugin.getGameManager().isGameStarted()){
+                    plugin.getGameManager().getArrowCooldowns().get(player).remove(plugin.getGameManager().getArrowCooldowns().get(player).indexOf(plugin.getGameManager().getTimeLeft()));
+                    player.getInventory().addItem(new ItemStack(Material.ARROW, 1));
+                }
+            }
+        }.runTaskTimer(plugin, 0, 20); // Check every second
+    }
+
     public void showGlow() {
         var protocolManager = ProtocolLibrary.getProtocolManager();
         protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
@@ -799,6 +819,7 @@ public class GameManager {
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers
         gameEnded = false;
         gameStarted = false;
+        leftPlayers = new HashMap<>();
         PriorityQueue<Pair<Integer, Player>> defendersKills =
                 new PriorityQueue<>((a, b) -> b.getKey() - a.getKey());
         PriorityQueue<Pair<Integer, Player>> attackersKills =
@@ -958,6 +979,10 @@ public class GameManager {
 
     public HashMap<Player, List<Integer>> getArrowCooldowns(){
         return arrowCooldowns;
+    }
+
+    public HashMap<String , Player> getLeftPlayers(){
+        return leftPlayers;
     }
 
     public Creeper getCreeper() {

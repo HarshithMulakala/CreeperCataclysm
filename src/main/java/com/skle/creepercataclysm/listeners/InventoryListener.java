@@ -16,6 +16,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -48,6 +49,11 @@ public class InventoryListener implements Listener {
         if(!(plugin.getGameManager().getPlayers().contains(player))) return;
         Inventory actionInventory = event.getClickedInventory();
         if(actionInventory == null) return;
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR)
+        {
+            event.setCancelled(true);
+            return;
+        }
         if(event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
             if(plugin.getShopManager().getDefenderShop().getViewers().contains(player) || plugin.getShopManager().getAttackerShop().getViewers().contains(player)){
                 event.setCancelled(true);
