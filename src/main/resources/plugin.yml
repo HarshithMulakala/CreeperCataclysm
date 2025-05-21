@@ -85,3 +85,7 @@ commands:
     description: Makes the statues the arg
     usage: /<command> <red/white/blue>
     aliases: []
+  captureprogress:
+    description: Makes the capture progress arg
+    usage: /<command> <int>
+    aliases: [progress]

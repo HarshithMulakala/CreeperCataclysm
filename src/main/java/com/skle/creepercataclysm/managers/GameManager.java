@@ -353,6 +353,7 @@ public class GameManager {
         initPlayers();
         initGold();
         initShop();
+        plugin.getStatueManager().resetStatues();
         timeLeft = (60 * 5) + ((attackers.size() - 1) * 60);
         totalTime = (60 * 5) + ((attackers.size() - 1) * 60);
         lastCreeperHitTime = timeLeft;
@@ -841,6 +842,7 @@ public class GameManager {
                 }
             }
         }
+        plugin.getStatueManager().resetStatues();
         Player topDefender = null;
         Player topAttacker = null;
         int topDefenderKills = 0;

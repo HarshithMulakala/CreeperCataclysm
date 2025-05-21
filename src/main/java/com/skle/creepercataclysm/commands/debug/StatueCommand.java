@@ -19,19 +19,19 @@ public class StatueCommand implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        if(args.length == 0) {
+        if(args.length < 0) {
             sender.sendMessage(ChatColor.RED + "[DEBUG] Usage: /statue <red/white/blue>");
             return false;
         }
 
         if(args[0].equalsIgnoreCase("red")) {
-            plugin.getStatueManager().statueToRed();
+            plugin.getStatueManager().statueToRed(0);
         }
         else if(args[0].equalsIgnoreCase("white")) {
-            plugin.getStatueManager().statueToWhite();
+            plugin.getStatueManager().statueToWhite(0);
         }
         else if(args[0].equalsIgnoreCase("blue")) {
-            plugin.getStatueManager().statueToBlue();
+            plugin.getStatueManager().statueToBlue(0);
         }
         else {
             sender.sendMessage(ChatColor.RED + "[DEBUG] Usage: /statue <red/white/blue>");

@@ -59,6 +59,8 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("hook").setExecutor(new GrapplingHookCommand(this));
 
         getCommand("statue").setExecutor(new StatueCommand(this));
+        
+        getCommand("captureprogress").setExecutor(new CaptureProgressCommand(this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);
