@@ -1,5 +1,7 @@
 package com.skle.creepercataclysm;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import com.skle.creepercataclysm.commands.*;
 import com.skle.creepercataclysm.commands.debug.*;
@@ -9,8 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-//import com.comphenix.protocol.ProtocolLibrary;
-//import com.comphenix.protocol.ProtocolManager;
+
 
 
 
@@ -25,9 +26,9 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
     private final GoldManager goldManager = new GoldManager(this);
     private final ShopManager shopManager = new ShopManager(this);
     private final ZoneManager zoneManager = new ZoneManager(this);
-    private final StatueManager statueManager = new StatueManager(this);
+    private StatueManager statueManager;
 
-//    private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+   private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
     private int MAX_PLAYERS = 2;
     @Override
@@ -35,6 +36,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         // Plugin startup logic
         saveDefaultConfig();
         // Register commands
+        statueManager = new StatueManager(this);
         getCommand("play").setExecutor(new PlayCommand(this));
         getCommand("queue").setExecutor(new QueueCommand(this));
         getCommand("leave").setExecutor(new LeaveCommand(this));
@@ -56,7 +58,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("grapplinghook").setExecutor(new GrapplingHookCommand(this));
         getCommand("hook").setExecutor(new GrapplingHookCommand(this));
 
-        getCommand("statueblue").setExecutor(new StatueBlueCommand(this));
+        getCommand("statue").setExecutor(new StatueCommand(this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);
@@ -94,9 +96,9 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         return queueManager;
     }
 
-//    public ProtocolManager getProtocolManager() {
-//        return manager;
-//    }
+    public ProtocolManager getProtocolManager() {
+        return manager;
+    }
 
     @Override
     public GoldManager getGoldManager() { return goldManager;}

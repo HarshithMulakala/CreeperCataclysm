@@ -1,14 +1,14 @@
 package com.skle.creepercataclysm.managers;
 
-//import com.comphenix.protocol.PacketType;
-//import com.comphenix.protocol.ProtocolLibrary;
-//import com.comphenix.protocol.events.PacketAdapter;
-//import com.comphenix.protocol.events.PacketEvent;
-//import com.comphenix.protocol.wrappers.WrappedDataValue;
-//import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-//import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
-//import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
+import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
 import org.bukkit.*;
 
 import java.util.*;
@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-//import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -369,6 +369,7 @@ public class GameManager {
 
     private void initCreeper() {
         creeper = currentMap.creeperspawn.getWorld().spawn(currentMap.creeperspawn, Creeper.class);
+        creeper.setRemoveWhenFarAway(false);
         creeper.setPowered(true);
         creeper.setAI(false);
         creeperhealth = 500 + (100 * attackers.size());
@@ -772,49 +773,48 @@ public class GameManager {
     }
 
     public void showGlow() {
-        return;
-//        var protocolManager = ProtocolLibrary.getProtocolManager();
-//        protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
-//            @Override
-//            public void onPacketSending(PacketEvent event) {
-//                if(isGameStarted()){
-//                    for (Player player : getPlayers()) {
-//                        Team theGlow = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(player.getName());
-//                        if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
-//                            if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
-//                                WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
-//                                if(player.getName().equals(event.getPlayer().getName())){
-//                                    return;
+        var protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                if(isGameStarted()){
+                    for (Player player : getPlayers()) {
+                        Team theGlow = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(player.getName());
+                        if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
+                            if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
+                                WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
+                                if(player.getName().equals(event.getPlayer().getName())){
+                                    return;
+                                }
+                                if (watcher.getWatchableObjects().stream()
+                                        .map(WrappedWatchableObject::getValue)
+                                        .filter(Byte.class::isInstance)
+                                        .map(Byte.class::cast)
+                                        .filter(Objects::nonNull)
+                                        .anyMatch(b -> b == ((byte) 0x40))){
+                                    return;
+                                }
+                                if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
+                                    WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
+                                    byte data = watcher.getByte(0);
+                                    data |= 1 << 6;
+                                    wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
+                                    wrapper.setEntityID(event.getPlayer().getEntityId());
+                                    wrapper.sendPacket(player);
+                                }
+//                                else {
+//                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
+//                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
+//                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
+//                                    newwrapper.sendPacket(player);
 //                                }
-//                                if (watcher.getWatchableObjects().stream()
-//                                        .map(WrappedWatchableObject::getValue)
-//                                        .filter(Byte.class::isInstance)
-//                                        .map(Byte.class::cast)
-//                                        .filter(Objects::nonNull)
-//                                        .anyMatch(b -> b == ((byte) 0x40))){
-//                                    return;
-//                                }
-//                                if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
-//                                    WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
-//                                    byte data = watcher.getByte(0);
-//                                    data |= 1 << 6;
-//                                    wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
-//                                    wrapper.setEntityID(event.getPlayer().getEntityId());
-//                                    wrapper.sendPacket(player);
-//                                }
-////                                else {
-////                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
-////                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
-////                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
-////                                    newwrapper.sendPacket(player);
-////                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//            }
-//        });
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
     }
 
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers

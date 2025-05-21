@@ -2,8 +2,7 @@ name: CreeperCataclysm
 version: '${project.version}'
 main: com.skle.creepercataclysm.CreeperCataclysm
 api-version: 1.20
-#depend: [ ProtocolLib ]
-depend: [ WorldEdit ]
+depend: [ ProtocolLib, WorldEdit ]
 load: POSTWORLD
 commands:
   play:
@@ -82,7 +81,7 @@ commands:
     description: Gives you a grappling hook
     usage: /<command>
     aliases: [hook]
-  statueblue:
-    description: Makes the statues blue
-    usage: /<command>
+  statue:
+    description: Makes the statues the arg
+    usage: /<command> <red/white/blue>
     aliases: []
