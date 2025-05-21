@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 public class SwitchTeamsCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
@@ -29,12 +31,12 @@ public class SwitchTeamsCommand implements CommandExecutor {
             player.sendMessage(ChatColor.RED + "You are not a player in the current game.");
             return false;
         }
-        if(plugin.getGameManager().getAttackers().contains(player)){
+        if (plugin.getGameManager().getAttackers().contains(player)){
             plugin.getGameManager().getAttackers().remove(player);
             plugin.getGameManager().getDefenders().add(player);
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam("attackers").removeEntry(player.getName());
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam("defenders").addEntry(player.getName());
-            player.setBedSpawnLocation(plugin.getGameManager().getCurrentMap().defenderspawn, true);
+            Objects.requireNonNull(Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam("attackers")).removeEntry(player.getName());
+            Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getTeam("defenders")).addEntry(player.getName());
+            player.setRespawnLocation(plugin.getGameManager().getCurrentMap().defenderspawn, true);
             plugin.getGameManager().setDefaultInventory(player, 0);
             player.teleport(plugin.getGameManager().getCurrentMap().defenderspawn);
             player.setGameMode(GameMode.ADVENTURE);
@@ -47,9 +49,9 @@ public class SwitchTeamsCommand implements CommandExecutor {
         } else {
             plugin.getGameManager().getDefenders().remove(player);
             plugin.getGameManager().getAttackers().add(player);
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam("defenders").removeEntry(player.getName());
-            Bukkit.getScoreboardManager().getMainScoreboard().getTeam("attackers").addEntry(player.getName());
-            player.setBedSpawnLocation(plugin.getGameManager().getCurrentMap().attackerspawn, true);
+            Objects.requireNonNull(Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getTeam("defenders")).removeEntry(player.getName());
+            Objects.requireNonNull(Bukkit.getScoreboardManager().getMainScoreboard().getTeam("attackers")).addEntry(player.getName());
+            player.setRespawnLocation(plugin.getGameManager().getCurrentMap().attackerspawn, true);
             plugin.getGameManager().setDefaultInventory(player, 1);
             player.teleport(plugin.getGameManager().getCurrentMap().attackerspawn);
             player.setGameMode(GameMode.ADVENTURE);

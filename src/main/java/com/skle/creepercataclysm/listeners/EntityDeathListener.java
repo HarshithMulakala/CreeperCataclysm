@@ -158,8 +158,9 @@ public class EntityDeathListener implements Listener {
                     if (entry.getValue()==max) {
                         plugin.getGoldManager().addGoldNug(entry.getKey(), 1);
                         String deathMessage = event.getDeathMessage();
+                        assert deathMessage != null;
                         String remainingMessage = deathMessage.substring(deathMessage.indexOf(" ") + 1, deathMessage.lastIndexOf(attacker.getName()));
-                        ChatColor colorKilled = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(victim.getName()).getColor();
+                        ChatColor colorKilled = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getEntryTeam(victim.getName()).getColor();
                         ChatColor colorKiller = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(attacker.getName()).getColor();
                         ChatColor colorAssist = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(entry.getKey().getName()).getColor();
                         DecimalFormat decimalFormat = new DecimalFormat("#.#");

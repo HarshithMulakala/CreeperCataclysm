@@ -2,27 +2,25 @@ package com.skle.creepercataclysm.listeners;
 
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDropItemEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static org.bukkit.event.player.PlayerFishEvent.State.FAILED_ATTEMPT;
+import static org.bukkit.event.player.PlayerFishEvent.State.IN_GROUND;
 
 public class EntityInteractListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -66,18 +64,18 @@ public class EntityInteractListener implements Listener {
             }
             else if(plugin.getGameManager().isGameStarted() && plugin.getGameManager().getPlayers().contains(player) && event.getItem().getType().equals(Material.GOAT_HORN)){
                 event.getItem().setAmount(event.getItem().getAmount() - 1);
-                player.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0));
                 player.stopAllSounds();
                 for (Entity entity : player.getNearbyEntities(10, 10, 10)) {
                     if(entity instanceof Player nearbyPlayer) {
                         if(plugin.getGameManager().getDefenders().contains(player)) {
                             if(plugin.getGameManager().getDefenders().contains(nearbyPlayer)) {
-                                nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0));
+                                nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0));
                             }
                         }
                         else if(plugin.getGameManager().getAttackers().contains(player)) {
                             if(plugin.getGameManager().getAttackers().contains(nearbyPlayer)) {
-                                nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0));
+                                nearbyPlayer.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0));
                             }
                         }
                         nearbyPlayer.stopAllSounds();
@@ -94,9 +92,34 @@ public class EntityInteractListener implements Listener {
                         p.playSound(p.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_0, 5, 1);
                     }
                 }
-
             }
          }
+    }
+
+    @EventHandler
+    public void onPlayerFish(PlayerFishEvent event) {
+        Player player = event.getPlayer();
+        FishHook hook = event.getHook();
+        if (!(player.getInventory().getItemInMainHand().equals(plugin.getZoneManager().getGrapplingHook()))) {
+            return;
+        }
+
+        if (event.getState() == PlayerFishEvent.State.REEL_IN || event.getState() == IN_GROUND) {
+            Vector hookLocation = hook.getLocation().toVector();
+            Vector playerLocation = player.getEyeLocation().toVector();
+            Vector direction = hookLocation.subtract(playerLocation);
+
+            direction.setY(Math.abs(direction.multiply(0.4).getY()));
+            player.setVelocity(direction);
+            hook.remove();
+            player.sendMessage(ChatColor.GOLD + "Speed (delta) X" + direction.getX());
+            player.sendMessage(ChatColor.GOLD + "Speed (delta) Y" + direction.getY());
+            player.sendMessage(ChatColor.GOLD + "Speed (delta) Z" + direction.getZ());
+            player.sendMessage(ChatColor.GOLD + "Player Current Speed X" + player.getVelocity().getX());
+            player.sendMessage(ChatColor.GOLD + "Player Current Speed Y" + player.getVelocity().getY());
+            player.sendMessage(ChatColor.GOLD + "Player Current Speed Z" + player.getVelocity().getZ());
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

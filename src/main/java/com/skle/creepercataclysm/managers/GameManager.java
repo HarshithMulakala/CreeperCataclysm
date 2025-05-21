@@ -1,14 +1,14 @@
 package com.skle.creepercataclysm.managers;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+//import com.comphenix.protocol.PacketType;
+//import com.comphenix.protocol.ProtocolLibrary;
+//import com.comphenix.protocol.events.PacketAdapter;
+//import com.comphenix.protocol.events.PacketEvent;
+//import com.comphenix.protocol.wrappers.WrappedDataValue;
+//import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+//import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
-import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
+//import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
 import org.bukkit.*;
 
 import java.util.*;
@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
+//import com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -374,7 +374,7 @@ public class GameManager {
         creeperhealth = 500 + (100 * attackers.size());
         creeper.setMaxHealth(creeperhealth);
         creeper.setMaxFuseTicks(20);
-        creeper.setExplosionRadius(30);
+        creeper.setExplosionRadius(100);
         creeper.setHealth(creeperhealth);
         creeper.setCustomName(ChatColor.GREEN + "CORE");
     }
@@ -474,11 +474,11 @@ public class GameManager {
         player.getInventory().setChestplate(chestplate);
 
         for(ItemStack item : player.getInventory().getContents()) {
-            if(item != null && item.getData() != null && item.getType() != Material.ARROW && item.getType() != Material.COOKED_BEEF) {
+            if(item != null && item.getType() != Material.ARROW && item.getType() != Material.COOKED_BEEF) {
                 ItemMeta meta = item.getItemMeta();
                 meta.setUnbreakable(true);
                 if(item.getType().equals(Material.LEATHER_CHESTPLATE) || item.getType().equals(Material.LEATHER_HELMET) || item.getType().equals(Material.IRON_LEGGINGS) || item.getType().equals(Material.IRON_BOOTS)) {
-                    meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+                    meta.addEnchant(Enchantment.PROTECTION, 1, true);
                 }
                 item.setItemMeta(meta);
             }
@@ -491,7 +491,7 @@ public class GameManager {
             @Override
             public void run() {
                 if(creeper.isDead()) {
-                    bossBar.setProgress(0 / creeper.getMaxHealth());
+                    bossBar.setProgress(0);
                     bossBar.setVisible(false);
                     bossBar.removeAll();
                     Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
@@ -652,8 +652,8 @@ public class GameManager {
         if(isGameStarted()){
             Objective objective = board.getObjective("CreeperCat");
             if(resets == 0){
-                board.getObjective("CreeperCat").unregister();
-                objective = board.registerNewObjective("CreeperCat", "dummy", ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.UNDERLINE + "Creeper Cataclysm");
+                Objects.requireNonNull(board.getObjective("CreeperCat")).unregister();
+                objective = board.registerNewObjective("CreeperCat", Criteria.DUMMY, ChatColor.GREEN + "" + ChatColor.BOLD + ChatColor.UNDERLINE + "Creeper Cataclysm");
                 objective.setDisplaySlot(DisplaySlot.SIDEBAR);
             }
 
@@ -772,48 +772,49 @@ public class GameManager {
     }
 
     public void showGlow() {
-        var protocolManager = ProtocolLibrary.getProtocolManager();
-        protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
-            @Override
-            public void onPacketSending(PacketEvent event) {
-                if(isGameStarted()){
-                    for (Player player : getPlayers()) {
-                        Team theGlow = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(player.getName());
-                        if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
-                            if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
-                                WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
-                                if(player.getName().equals(event.getPlayer().getName())){
-                                    return;
-                                }
-                                if (watcher.getWatchableObjects().stream()
-                                        .map(WrappedWatchableObject::getValue)
-                                        .filter(Byte.class::isInstance)
-                                        .map(Byte.class::cast)
-                                        .filter(Objects::nonNull)
-                                        .anyMatch(b -> b == ((byte) 0x40))){
-                                    return;
-                                }
-                                if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
-                                    WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
-                                    byte data = watcher.getByte(0);
-                                    data |= 1 << 6;
-                                    wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
-                                    wrapper.setEntityID(event.getPlayer().getEntityId());
-                                    wrapper.sendPacket(player);
-                                }
-//                                else {
-//                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
-//                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
-//                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
-//                                    newwrapper.sendPacket(player);
+        return;
+//        var protocolManager = ProtocolLibrary.getProtocolManager();
+//        protocolManager.addPacketListener(new PacketAdapter(plugin, PacketType.Play.Server.ENTITY_METADATA, PacketType.Play.Server.NAMED_ENTITY_SPAWN) {
+//            @Override
+//            public void onPacketSending(PacketEvent event) {
+//                if(isGameStarted()){
+//                    for (Player player : getPlayers()) {
+//                        Team theGlow = Bukkit.getScoreboardManager().getMainScoreboard().getEntryTeam(player.getName());
+//                        if (theGlow != null && theGlow.getEntries().contains(event.getPlayer().getName())) {
+//                            if (/*has a player with*/player.getEntityId() == event.getPacket().getIntegers().read(0)) {
+//                                WrappedDataWatcher watcher = WrappedDataWatcher.getEntityWatcher(event.getPlayer());
+//                                if(player.getName().equals(event.getPlayer().getName())){
+//                                    return;
 //                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-        });
+//                                if (watcher.getWatchableObjects().stream()
+//                                        .map(WrappedWatchableObject::getValue)
+//                                        .filter(Byte.class::isInstance)
+//                                        .map(Byte.class::cast)
+//                                        .filter(Objects::nonNull)
+//                                        .anyMatch(b -> b == ((byte) 0x40))){
+//                                    return;
+//                                }
+//                                if (event.getPacketType() == PacketType.Play.Server.ENTITY_METADATA) {
+//                                    WrapperPlayServerEntityMetadata wrapper = new WrapperPlayServerEntityMetadata();
+//                                    byte data = watcher.getByte(0);
+//                                    data |= 1 << 6;
+//                                    wrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), data));
+//                                    wrapper.setEntityID(event.getPlayer().getEntityId());
+//                                    wrapper.sendPacket(player);
+//                                }
+////                                else {
+////                                    WrapperPlayServerEntityMetadata newwrapper = new WrapperPlayServerEntityMetadata();
+////                                    newwrapper.addToDataValueCollection(new WrappedDataValue(0, Registry.get(Byte.class), (byte) 0));
+////                                    newwrapper.setEntityID(event.getPlayer().getEntityId());
+////                                    newwrapper.sendPacket(player);
+////                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            }
+//        });
     }
 
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers
@@ -854,14 +855,12 @@ public class GameManager {
             topAttackerKills = totalKills.get(topAttacker);
         }
 
-
-
         for(Player p : players) {
             p.setLevel(0);
             p.setExp(0);
             p.getInventory().clear();
             p.teleport(lobbySpawn);
-            p.setBedSpawnLocation(lobbySpawn, true);
+            p.setRespawnLocation(lobbySpawn, true);
             for(PotionEffect effect : p.getActivePotionEffects()) {
                 p.removePotionEffect(effect.getType());
             }
@@ -872,14 +871,14 @@ public class GameManager {
             stickmeta.addEnchant(Enchantment.KNOCKBACK, 10, true);
             knockbackstick.setItemMeta(stickmeta);
             p.getInventory().addItem(knockbackstick);
-            p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3));
             sendCenteredMessage(p,ChatColor.GREEN + "§l============================================");
             sendCenteredMessage(p,ChatColor.WHITE + "§lCreeper Cataclysm");
             sendCenteredMessage(p,"");
             if(winner == 0){
-                sendCenteredMessage(p,"§lWinner" + ChatColor.GRAY + " - " + ChatColor.BLUE + "§lDefenders");
+                sendCenteredMessage(p, ChatColor.BLUE + "§lDEFENDERS WIN");
             } else {
-                sendCenteredMessage(p,"§lWinner" + ChatColor.GRAY + " - " + ChatColor.RED + "§lAttackers");
+                sendCenteredMessage(p, ChatColor.RED + "§lATTACKERS WIN");
             }
             sendCenteredMessage(p,"");
             sendCenteredMessage(p,ChatColor.YELLOW + "§lDeadliest Defender" + ChatColor.GRAY + " - " + ChatColor.BLUE + (topDefenderKills == 0 ? "None" : topDefender.getName()) + ChatColor.WHITE + " [" + topDefenderKills + "]");
@@ -932,9 +931,11 @@ public class GameManager {
         plugin.getQueueManager().resetQueue();
         plugin.getGoldManager().resetGame();
         plugin.getShopManager().resetShop();
-        board.getObjective("deaths").unregister();
-        board.registerNewObjective("deaths", "deathCount", ChatColor.RED + "Deaths");
-        board.getObjective("deaths").setDisplaySlot(DisplaySlot.SIDEBAR);
+        if(board.getObjective("deaths") != null) {
+            board.getObjective("deaths").unregister();
+        }
+        board.registerNewObjective("deaths", Criteria.DEATH_COUNT, ChatColor.RED + "Deaths");
+        Objects.requireNonNull(board.getObjective("deaths")).setDisplaySlot(DisplaySlot.SIDEBAR);
         for (Player player : Bukkit.getOnlinePlayers()) {
             Score deathsScore = board.getObjective("deaths").getScore(player.getName());
             deathsScore.setScore(0);

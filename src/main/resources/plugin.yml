@@ -2,7 +2,8 @@ name: CreeperCataclysm
 version: '${project.version}'
 main: com.skle.creepercataclysm.CreeperCataclysm
 api-version: 1.20
-depend: [ ProtocolLib ]
+#depend: [ ProtocolLib ]
+depend: [ WorldEdit ]
 load: POSTWORLD
 commands:
   play:
@@ -31,6 +32,10 @@ commands:
     aliases: [a]
   tpsnow:
     description: Teleport to the snow
+    usage: /<command>
+    aliases: []
+  tplobby:
+    description: Teleport to the lobby
     usage: /<command>
     aliases: []
   forcestart:
@@ -73,4 +78,11 @@ commands:
     description: Reset the deaths of all players
     usage: /<command>
     aliases: [rd]
-
+  grapplinghook:
+    description: Gives you a grappling hook
+    usage: /<command>
+    aliases: [hook]
+  statueblue:
+    description: Makes the statues blue
+    usage: /<command>
+    aliases: []

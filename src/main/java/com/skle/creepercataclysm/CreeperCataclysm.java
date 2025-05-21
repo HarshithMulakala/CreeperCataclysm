@@ -9,8 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
+//import com.comphenix.protocol.ProtocolLibrary;
+//import com.comphenix.protocol.ProtocolManager;
 
 
 
@@ -25,8 +25,9 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
     private final GoldManager goldManager = new GoldManager(this);
     private final ShopManager shopManager = new ShopManager(this);
     private final ZoneManager zoneManager = new ZoneManager(this);
+    private final StatueManager statueManager = new StatueManager(this);
 
-    private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+//    private final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
     private int MAX_PLAYERS = 2;
     @Override
@@ -51,6 +52,11 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         getCommand("resetdeaths").setExecutor(new ResetDeathsCommand(this));
         getCommand("switchteam").setExecutor(new SwitchTeamsCommand(this));
         getCommand("tpsnow").setExecutor(new TeleportSnowCommand(this));
+        getCommand("tplobby").setExecutor(new TeleportLobbyCommand(this));
+        getCommand("grapplinghook").setExecutor(new GrapplingHookCommand(this));
+        getCommand("hook").setExecutor(new GrapplingHookCommand(this));
+
+        getCommand("statueblue").setExecutor(new StatueBlueCommand(this));
 
         // Register listeners
         Bukkit.getServer().getPluginManager().registerEvents(new EntityDamageListener(this), this);
@@ -88,9 +94,9 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         return queueManager;
     }
 
-    public ProtocolManager getProtocolManager() {
-        return manager;
-    }
+//    public ProtocolManager getProtocolManager() {
+//        return manager;
+//    }
 
     @Override
     public GoldManager getGoldManager() { return goldManager;}
@@ -100,6 +106,8 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
 
     @Override
     public ZoneManager getZoneManager() { return zoneManager; }
+
+    public StatueManager getStatueManager() { return statueManager; }
 
     @Override
     public int getMaxPlayers() {

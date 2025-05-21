@@ -14,6 +14,7 @@ public class ZoneManager {
     private final CreeperCataclysmPlugin plugin;
     private ItemStack lobbyZoneWand;
     private ItemStack mapZoneWand;
+    private ItemStack grapplingHook;
 
     public ZoneManager(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
@@ -28,14 +29,20 @@ public class ZoneManager {
         lobbyZoneWand = new ItemStack(Material.STICK);
         ItemMeta zoningStickMeta = lobbyZoneWand.getItemMeta();
         zoningStickMeta.setDisplayName(ChatColor.AQUA + "Lobby Zoning Stick");
-        zoningStickMeta.addEnchant(Enchantment.DURABILITY, 100, true);
+        zoningStickMeta.addEnchant(Enchantment.UNBREAKING, 100, true);
         lobbyZoneWand.setItemMeta(zoningStickMeta);
 
         mapZoneWand = new ItemStack(Material.STICK);
         ItemMeta mapZoningStickMeta = mapZoneWand.getItemMeta();
         mapZoningStickMeta.setDisplayName(ChatColor.AQUA + "Map Zoning Stick");
-        mapZoningStickMeta.addEnchant(Enchantment.DURABILITY, 100, true);
+        mapZoningStickMeta.addEnchant(Enchantment.UNBREAKING, 100, true);
         mapZoneWand.setItemMeta(mapZoningStickMeta);
+
+        grapplingHook = new ItemStack(Material.FISHING_ROD);
+        ItemMeta grapplingHookMeta = grapplingHook.getItemMeta();
+        grapplingHookMeta.setDisplayName(ChatColor.AQUA + "Grappling Hook");
+        grapplingHookMeta.addEnchant(Enchantment.UNBREAKING, 100, true);
+        grapplingHook.setItemMeta(grapplingHookMeta);
     }
 
     public void setLobbyZone(Player player) {
@@ -132,6 +139,8 @@ public class ZoneManager {
     public ItemStack getMapZoneWand() {
         return mapZoneWand;
     }
+
+    public ItemStack getGrapplingHook() {return grapplingHook; }
 
     public void reloadConfigs() {
         plugin.reloadPluginConfig();

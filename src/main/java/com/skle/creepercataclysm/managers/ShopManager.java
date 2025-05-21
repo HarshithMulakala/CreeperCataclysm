@@ -49,7 +49,13 @@ public class ShopManager {
                     new Material[]{}),
             new ShopItem(Material.GOAT_HORN,
                     5, 5, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
-                    new Material[]{})
+                    new Material[]{}),
+            new ShopItem(Material.MACE,
+                    15, 6, "Mace", "Smash!",
+                    new Material[]{}),
+            new ShopItem(Material.WIND_CHARGE,
+                    3, 7, "Wind Charge", "A concentrated pocket of wind!",
+                    new Material[]{}, 10)
     };
 
     private final ShopItem[] attackerShopItems = {
@@ -75,7 +81,13 @@ public class ShopManager {
                     new Material[]{}),
             new ShopItem(Material.GOAT_HORN,
                     5, 5, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
-                    new Material[]{})
+                    new Material[]{}),
+            new ShopItem(Material.MACE,
+                    15, 6, "Mace", "Smash!",
+                    new Material[]{}),
+            new ShopItem(Material.WIND_CHARGE,
+                    3, 7, "Wind Charge", "A concentrated pocket of wind!",
+                    new Material[]{}, 10)
     };
 
     private static class ShopItem {
@@ -89,11 +101,11 @@ public class ShopManager {
         public ItemStack displayStack;
         public ItemStack purchaseStack;
 
-        public ShopItem(Material item, int cost, int slot, String name, String description) {
-            this(item, cost, slot, name, description, null);
+        public ShopItem(Material item, int cost, int slot, String name, String description, Material[] itemToReplace) {
+            this(item, cost, slot, name, description, itemToReplace, 1);
         }
 
-        public ShopItem(Material item, int cost, int slot, String name, String description, Material[] itemToReplace) {
+        public ShopItem(Material item, int cost, int slot, String name, String description, Material[] itemToReplace, int amount) {
             this.item = item;
             this.cost = cost;
             this.slot = slot;
@@ -110,12 +122,14 @@ public class ShopManager {
             lore.add(ChatColor.GRAY + description);
             displayMeta.setLore(lore);
             displayMeta.setUnbreakable(true);
+            displayStack.setAmount(amount);
             displayStack.setItemMeta(displayMeta);
 
             purchaseStack = new ItemStack(item);
             ItemMeta purchaseMeta = purchaseStack.getItemMeta();
             purchaseMeta.setDisplayName("§r" + name);
             purchaseMeta.setUnbreakable(true);
+            purchaseStack.setAmount(amount);
             purchaseStack.setItemMeta(purchaseMeta);
         }
     }

@@ -45,7 +45,7 @@ public class QueueManager {
             return;
         }
         for (Player p : queue) {
-            p.sendMessage(ChatColor.AQUA + player.getName() + " has left the queue! (" + queue.size() + "/" + plugin.getMaxPlayers() + ")");
+            p.sendMessage(ChatColor.AQUA + player.getName() + " has left the queue! (" + (queue.size()-1) + "/" + plugin.getMaxPlayers() + ")");
         }
         queue.remove(player);
     }

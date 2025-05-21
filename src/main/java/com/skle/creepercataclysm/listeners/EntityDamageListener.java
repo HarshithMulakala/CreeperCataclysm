@@ -108,15 +108,16 @@ public class EntityDamageListener implements Listener {
         }
 
         if(!plugin.getGameManager().isGameStarted()) return;
-        if(event.getEntity().equals(plugin.getGameManager().getCreeper())) {
-            if(plugin.getGameManager().getCreeper().getHealth() - event.getDamage() <= 0) {
+        Creeper creeper = plugin.getGameManager().getCreeper();
+        if(event.getEntity().equals(creeper)) {
+            if(creeper.getHealth() - event.getDamage() <= 0) {
                 event.setCancelled(true);
-                Location loc = plugin.getGameManager().getCreeper().getLocation();
+                Location loc = creeper.getLocation();
                 int i = 1;
                 double z = loc.getZ();
-                loc.setX(loc.getX() - 7);
-                loc.setY(loc.getY() - 1);
-                loc.setYaw(-90);
+                loc.add(creeper.getLocation().getDirection().normalize().multiply(5));
+                loc.setY(loc.getY() + 1);
+                loc.setYaw(creeper.getLocation().getYaw() * -1);
                 for(Player p: plugin.getGameManager().getAttackers()) {
                     loc.setZ(z + i);
                     i++;
@@ -134,7 +135,7 @@ public class EntityDamageListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
                     @Override
                     public void run() {
-                        plugin.getGameManager().getCreeper().ignite();
+                        creeper.ignite();
                     }
                 }, 30L);
 
@@ -175,7 +176,7 @@ public class EntityDamageListener implements Listener {
     public void onPlayerHitPlayer(EntityDamageByEntityEvent event){
         if(!plugin.getGameManager().isGameStarted()) return;
         if(event.getDamager().equals(event.getEntity())) return;
-        if(event.getEntity().equals(plugin.getGameManager().getCreeper()) && event.getDamager() instanceof Player attacker) {
+        if(event.getEntity().equals(plugin.getGameManager().getCreeper()) && event.getDamager() instanceof Player attacker && plugin.getGameManager().getAttackers().contains(attacker)) {
             plugin.getGameManager().getTotalCreeperDamage().put(attacker, plugin.getGameManager().getTotalCreeperDamage().get(attacker) + event.getDamage());
         }
         if(event.getEntity() instanceof Player victim && event.getDamager() instanceof Player attacker){

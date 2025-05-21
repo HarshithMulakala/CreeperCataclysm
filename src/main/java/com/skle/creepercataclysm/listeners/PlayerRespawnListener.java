@@ -27,6 +27,7 @@ import org.bukkit.scoreboard.Score;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class PlayerRespawnListener implements Listener {
     private final CreeperCataclysmPlugin plugin;
@@ -65,12 +66,13 @@ public class PlayerRespawnListener implements Listener {
                     if(!event.getPlayer().getInventory().contains(Material.STICK)){
                         ItemStack knockbackstick = new ItemStack(Material.STICK);
                         ItemMeta stickmeta = knockbackstick.getItemMeta();
+                        assert stickmeta != null;
                         stickmeta.setDisplayName(ChatColor.RED + "Knockback Stick");
                         stickmeta.addEnchant(Enchantment.KNOCKBACK, 10, true);
                         knockbackstick.setItemMeta(stickmeta);
                         event.getPlayer().getInventory().addItem(knockbackstick);
                     }
-                    event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3));
+                    event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3));
                 }
             }, 1L);
             return;
@@ -109,7 +111,7 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         if(!plugin.getGameManager().isGameStarted()) {
-            Score deathsScore = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("deaths").getScore(event.getPlayer().getName());
+            Score deathsScore = Objects.requireNonNull(Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard().getObjective("deaths")).getScore(event.getPlayer().getName());
             if(!(deathsScore.getScore() > 0)){
                 deathsScore.setScore(0);
             }
@@ -118,20 +120,22 @@ public class PlayerRespawnListener implements Listener {
                     if(helmetMeta.getColor().equals(Color.RED) || helmetMeta.getColor().equals(Color.BLUE)){
                         FileConfiguration config = plugin.getPluginConfig();
                         ConfigurationSection lobby = config.getConfigurationSection("lobby");
-                        Location lobbySpawn = new Location(Bukkit.getWorld(lobby.getString("world")), lobby.getDouble("x"), lobby.getDouble("y"), lobby.getDouble("z"), (float)lobby.getDouble("yaw"), (float)lobby.getDouble("pitch"));
+                        assert lobby != null;
+                        Location lobbySpawn = new Location(Bukkit.getWorld(Objects.requireNonNull(lobby.getString("world"))), lobby.getDouble("x"), lobby.getDouble("y"), lobby.getDouble("z"), (float)lobby.getDouble("yaw"), (float)lobby.getDouble("pitch"));
                         event.getPlayer().teleport(lobbySpawn);
                         event.getPlayer().setLevel(0);
                         event.getPlayer().setExp(0);
                         event.getPlayer().getInventory().clear();
-                        event.getPlayer().setBedSpawnLocation(lobbySpawn, true);
+                        event.getPlayer().setRespawnLocation(lobbySpawn, true);
                         event.getPlayer().setGameMode(GameMode.ADVENTURE);
                         ItemStack knockbackstick = new ItemStack(Material.STICK);
                         ItemMeta stickmeta = knockbackstick.getItemMeta();
+                        assert stickmeta != null;
                         stickmeta.setDisplayName(ChatColor.RED + "Knockback Stick");
                         stickmeta.addEnchant(Enchantment.KNOCKBACK, 10, true);
                         knockbackstick.setItemMeta(stickmeta);
                         event.getPlayer().getInventory().addItem(knockbackstick);
-                        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP, PotionEffect.INFINITE_DURATION, 3));
+                        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, PotionEffect.INFINITE_DURATION, 3));
                     }
                 }
             }
@@ -141,7 +145,7 @@ public class PlayerRespawnListener implements Listener {
         Player oldPLayer = plugin.getGameManager().getLeftPlayers().get(event.getPlayer().getName());
         Player newPlayer = event.getPlayer();
         //true = Defender false = Attacker
-        boolean team = plugin.getGameManager().getDefenders().contains(oldPLayer) ? true : false;
+        boolean team = plugin.getGameManager().getDefenders().contains(oldPLayer);
         plugin.getGameManager().getKillMap().put(newPlayer, plugin.getGameManager().getKillMap().remove(oldPLayer));
         plugin.getGameManager().getDamageMap().put(newPlayer, plugin.getGameManager().getDamageMap().remove(oldPLayer));
         plugin.getGameManager().getPlayerKillMap().put(newPlayer, plugin.getGameManager().getPlayerKillMap().remove(oldPLayer));

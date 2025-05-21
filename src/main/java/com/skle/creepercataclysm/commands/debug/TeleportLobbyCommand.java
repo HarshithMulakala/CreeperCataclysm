@@ -8,10 +8,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TeleportSnowCommand implements CommandExecutor {
+public class TeleportLobbyCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
 
-    public TeleportSnowCommand(CreeperCataclysmPlugin plugin) {
+    public TeleportLobbyCommand(CreeperCataclysmPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -20,7 +20,7 @@ public class TeleportSnowCommand implements CommandExecutor {
         if(!(sender instanceof Player player)) {
             return false;
         }
-        player.teleport(new Location(player.getWorld(), 1066, -47, 1092));
+        player.teleport(new Location(player.getWorld(), -12, 9, 101));
         return true;
     }
 }

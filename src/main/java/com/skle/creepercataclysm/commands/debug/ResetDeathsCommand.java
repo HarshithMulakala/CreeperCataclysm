@@ -7,9 +7,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+
+import java.util.Objects;
 
 public class ResetDeathsCommand implements CommandExecutor {
     private final CreeperCataclysmPlugin plugin;
@@ -21,13 +24,13 @@ public class ResetDeathsCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         // Get the scoreboard
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
 
-        scoreboard.getObjective("deaths").unregister();
-        scoreboard.registerNewObjective("deaths", "deathCount", ChatColor.RED + "Deaths");
-        scoreboard.getObjective("deaths").setDisplaySlot(DisplaySlot.SIDEBAR);
+        Objects.requireNonNull(scoreboard.getObjective("deaths")).unregister();
+        scoreboard.registerNewObjective("deaths", Criteria.DEATH_COUNT, ChatColor.GOLD + "Deaths");
+        Objects.requireNonNull(scoreboard.getObjective("deaths")).setDisplaySlot(DisplaySlot.SIDEBAR);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Score deathsScore = scoreboard.getObjective("deaths").getScore(player.getName());
+            Score deathsScore = Objects.requireNonNull(scoreboard.getObjective("deaths")).getScore(player.getName());
             deathsScore.setScore(0);
         }
         return true;
