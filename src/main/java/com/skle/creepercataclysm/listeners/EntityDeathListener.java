@@ -131,11 +131,17 @@ public class EntityDeathListener implements Listener {
         if(attacker.equals(victim)){
             return;
         }
+        String itemName = attacker.getInventory().getItemInMainHand().getType().toString().toUpperCase().replace("_", " ");
+        String originalMessage = event.getDeathMessage();
+        int usingIndex = originalMessage.indexOf(" using ");
+        if (usingIndex != -1) {
+            originalMessage = originalMessage.substring(0, usingIndex);
+        }
+        event.setDeathMessage(originalMessage + ChatColor.WHITE + " by " + itemName);
         if(!(plugin.getGameManager().getPlayers().contains(attacker) && plugin.getGameManager().getPlayers().contains(victim))) return;
         if(plugin.getGameManager().getDefenders().contains(attacker)){
             if(plugin.getGameManager().getKillMap().get(attacker) < plugin.getGameManager().getDefenderGoldStart() + 3){
                 plugin.getGameManager().getKillMap().put(attacker, plugin.getGameManager().getKillMap().get(attacker) + 1);
-
             }
         }
         else{

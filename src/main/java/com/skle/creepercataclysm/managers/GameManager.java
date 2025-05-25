@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.skle.creepercataclysm.api.CreeperCataclysmPlugin;
+import com.skle.creepercataclysm.listeners.ProjectileListener;
 import com.skle.creepercataclysm.packets.WrapperPlayServerEntityMetadata;
 import org.bukkit.*;
 
@@ -821,6 +822,7 @@ public class GameManager {
     public void endGame(int winner) { // 0 - Defenders, 1 - Attackers
         gameEnded = false;
         gameStarted = false;
+        ProjectileListener.onEndGame();
         leftPlayers = new HashMap<>();
         PriorityQueue<Pair<Integer, Player>> defendersKills =
                 new PriorityQueue<>((a, b) -> b.getKey() - a.getKey());

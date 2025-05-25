@@ -49,9 +49,6 @@ public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void EntityExplode(EntityExplodeEvent event){
-        for (Player player : plugin.getGameManager().getPlayers()) {
-            player.sendMessage("EntityExplode Called");
-        }
         if(event.getEntity() instanceof TNTPrimed){
             event.blockList().clear();
         }

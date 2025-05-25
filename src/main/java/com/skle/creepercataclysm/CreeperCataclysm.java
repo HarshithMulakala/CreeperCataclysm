@@ -71,6 +71,7 @@ public final class CreeperCataclysm extends JavaPlugin implements CreeperCatacly
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ProjectileListener(this), this);
 
         gameManager.showGlow();
         gameManager.initConfig();

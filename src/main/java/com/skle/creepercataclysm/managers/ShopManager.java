@@ -48,14 +48,17 @@ public class ShopManager {
                     15, 4, "Shield", "A shield that can be used to block attacks.",
                     new Material[]{}),
             new ShopItem(Material.GOAT_HORN,
-                    5, 5, "Goat Horn", "When played it gives ally players near you a strength boost. Try not die with it :)",
+                    5, 5, "Goat Horn", "When played it gives ally players near you\na strength boost. Try not die with it :)",
                     new Material[]{}),
             new ShopItem(Material.MACE,
                     15, 6, "Mace", "Smash!",
                     new Material[]{}),
             new ShopItem(Material.WIND_CHARGE,
                     3, 7, "Wind Charge", "A concentrated pocket of wind!",
-                    new Material[]{}, 10)
+                    new Material[]{}, 10),
+            new ShopItem(Material.EGG,
+                    5, 8, "Iso Ultimate", "It's you and me!",
+                    new Material[]{}, 1)
     };
 
     private final ShopItem[] attackerShopItems = {
@@ -87,7 +90,10 @@ public class ShopManager {
                     new Material[]{}),
             new ShopItem(Material.WIND_CHARGE,
                     3, 7, "Wind Charge", "A concentrated pocket of wind!",
-                    new Material[]{}, 10)
+                    new Material[]{}, 10),
+            new ShopItem(Material.EGG,
+                    5, 8, "Iso Ultimate", "No distractions.",
+                    new Material[]{}, 1)
     };
 
     private static class ShopItem {

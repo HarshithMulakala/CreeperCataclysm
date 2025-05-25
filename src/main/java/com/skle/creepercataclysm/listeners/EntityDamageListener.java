@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.DecimalFormat;
@@ -99,11 +100,18 @@ public class EntityDamageListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) throws InterruptedException {
         if(event.getEntity() instanceof Player player) {
+            //print message to every online player
+//            for (Player p : Bukkit.getOnlinePlayers()) {
+//                p.sendMessage(event.getCause().toString());
+//            }
             if(event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 event.setCancelled(true);
-                if(player.getLocation().getY() == -60 && player.getLocation().getBlock().getType() == Material.LAVA){
-                    player.setHealth(0);
-                }
+                return;
+            }
+            if(player.getLocation().getY() <= -60 && event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+                player.setHealth(1);
+//                event.setCancelled(true);
+                return;
             }
         }
 
@@ -119,6 +127,9 @@ public class EntityDamageListener implements Listener {
                 loc.setY(loc.getY() + 1);
                 loc.setYaw(creeper.getLocation().getYaw() * -1);
                 for(Player p: plugin.getGameManager().getAttackers()) {
+                    for (PotionEffect effect : p.getActivePotionEffects()) {
+                        p.removePotionEffect(effect.getType());
+                    }
                     loc.setZ(z + i);
                     i++;
                     p.teleport(loc);
@@ -126,6 +137,9 @@ public class EntityDamageListener implements Listener {
                 }
                 i = 1;
                 for(Player p: plugin.getGameManager().getDefenders()) {
+                    for (PotionEffect effect : p.getActivePotionEffects()) {
+                        p.removePotionEffect(effect.getType());
+                    }
                     loc.setZ(z - i);
                     p.teleport(loc);
                     p.sendTitle(ChatColor.RED + "Attackers Win!", "", 10, 40, 10);
